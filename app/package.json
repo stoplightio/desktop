@@ -1,0 +1,24 @@
+{
+  "name": "Stoplight",
+  "description": "The kickass toolkit for APIs.",
+  "version": "0.15.3",
+  "environment": "production",
+  "homepage": "https://stoplight.io",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Stoplight",
+    "email": "support@stoplight.io"
+  },
+  "main": "./main.js",
+  "dependencies": {
+    "body-parser": "1.x.x",
+    "chokidar": "^1.6.1",
+    "debug": "2.6.x",
+    "electron-auto-updater": "1.0.x",
+    "express": "4.x.x",
+    "fs-extra": "^2.0.0",
+    "ip": "1.x.x",
+    "lodash": "4.x.x",
+    "ps-tree": "1.x.x"
+  }
+}

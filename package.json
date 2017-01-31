@@ -1,0 +1,61 @@
+{
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stoplightio/stoplight-app.git"
+  },
+  "scripts": {
+    "start": "NODE_ENV=development electron ./app",
+    "pre:build": "node build-pre",
+    "post:build": "node build-post",
+    "build": "build --mac --linux --win --x64",
+    "release": "build --mac --linux --win --x64",
+    "build:production": "NODE_ENV=production npm run pre:build && npm run build && npm run post:build",
+    "build:staging": "NODE_ENV=staging build",
+    "release:production": "NODE_ENV=production npm run pre:build && npm run release && npm run post:build",
+    "release:staging": "NODE_ENV=staging npm run pre:build && npm run release && npm run post:build"
+  },
+  "devDependencies": {
+    "adm-zip": "0.4.x",
+    "del": "2.x.x",
+    "electron-builder": "11.x.x",
+    "electron-prebuilt": "1.4.x",
+    "fs-extra": "2.x.x",
+    "request": "2.x.x"
+  },
+  "build": {
+    "overwrite": true,
+    "appId": "com.stoplight.stoplight",
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "linux": {
+      "category": "Development",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "download.strictSSL": false,
+    "iconUrl": "https://s3.amazonaws.com/stoplight/icon.ico",
+    "compression": "normal",
+    "asar": false,
+    "extraResources": [
+      {
+        "from": "build-tmp/${os}/${arch}",
+        "to": "app"
+      }
+    ],
+    "publish": {
+      "provider": "github"
+    }
+  }
+}
