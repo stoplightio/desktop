@@ -27,7 +27,7 @@ global.Electron = {
   proxyPath: Path.join(__dirname, 'proxy'),
   version: app.getVersion(),
   defaultProxyConfig: {
-    port: '4010',
+    port: '4020',
     forwardHost: 'http://localhost:3000',
     log: true,
     debug: true,
