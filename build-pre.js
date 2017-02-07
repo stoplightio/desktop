@@ -44,12 +44,6 @@ const proxyMap = {
 const mkProxyFiles = (os, arch) => {
   const buildPath = `build-tmp/${os}/${arch}/proxy`;
 
-  // create the empty proxy files
-  fs.outputJSONSync(`${buildPath}/config.json`, {});
-  f.chmodSync(`${buildPath}/config.json`, '777');
-  fs.outputJSONSync(`${buildPath}/spec.json`);
-  f.chmodSync(`${buildPath}/spec.json`, '777');
-
   // copy the correct binary over
   const proxyDetails = proxyMap[os][arch];
   fs.copySync(`build-tmp/prism/bundle/${proxyDetails.source}`, `${buildPath}/${proxyDetails.target}`);

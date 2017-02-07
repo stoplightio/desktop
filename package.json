@@ -1,7 +1,7 @@
 {
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stoplightio/stoplight-app.git"
+    "url": "git+https://github.com/stoplightio/desktop.git"
   },
   "scripts": {
     "start": "NODE_ENV=development electron ./app",
@@ -10,14 +10,14 @@
     "build": "build --mac --linux --win --x64",
     "release": "build --mac --linux --win --x64",
     "build:production": "NODE_ENV=production npm run pre:build && npm run build && npm run post:build",
-    "build:staging": "NODE_ENV=staging build",
+    "build:staging": "NODE_ENV=staging npm run build",
     "release:production": "NODE_ENV=production npm run pre:build && npm run release && npm run post:build",
     "release:staging": "NODE_ENV=staging npm run pre:build && npm run release && npm run post:build"
   },
   "devDependencies": {
     "adm-zip": "0.4.x",
     "del": "2.x.x",
-    "electron-builder": "11.x.x",
+    "electron-builder": "12.x.x",
     "electron-prebuilt": "1.4.x",
     "fs-extra": "2.x.x",
     "request": "2.x.x"

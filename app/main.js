@@ -71,14 +71,12 @@ api.setLogger(browserLogger);
 process.env.NODE_ENV = process.env.NODE_ENV || pjson.environment || 'development';
 switch (process.env.NODE_ENV) {
   case 'production':
-    process.env.SL_API_HOST = 'https://api.stoplight.io/v1';
-    process.env.SL_HOST = 'https://app.stoplight.io';
-    process.env.SL_UPDATE_HOST = 'https://download.stoplight.io';
+    process.env.SL_API_HOST = 'https://api-next.stoplight.io';
+    process.env.SL_HOST = 'https://scenarios.stoplight.io';
     break;
   case 'staging':
-    process.env.SL_API_HOST = 'https://api-staging.stoplight.io/v1';
-    process.env.SL_HOST = 'https://app-staging.stoplight.io';
-    process.env.SL_UPDATE_HOST = 'https://stoplight-download-staging.herokuapp.com';
+    process.env.SL_API_HOST = 'https://api-next-staging.stoplight.io';
+    process.env.SL_HOST = 'https://next-staging.stoplight.io';
     break;
   default:
     process.env.SL_API_HOST = 'http://localhost:3030';
@@ -291,28 +289,6 @@ const checkForUpdates = () => {
   lastCheck = new Date();
   autoUpdater.checkForUpdates();
 };
-
-if (process.env.SL_UPDATE_HOST && process.platform !== 'linux') {
-  if (process.platform === 'darwin') {
-    autoUpdater.setFeedURL(`${process.env.SL_UPDATE_HOST}/update/${platform}/${version}`);
-  }
-
-  checkForUpdates();
-  setInterval(() => {
-    checkForUpdates();
-  }, 1000 * 60 * 30);
-
-  app.on('browser-window-focus', () => {
-    const now = new Date();
-
-    // auto check at most once every 5 minutes
-    if (lastCheck && now.getTime() - lastCheck.getTime() < 300000) {
-      return;
-    }
-
-    checkForUpdates();
-  });
-}
 
 ipcMain.on('updater.check', (event) => {
   manualUpdateCheck = true;
