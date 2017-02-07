@@ -94,7 +94,7 @@ function startServer(options, cb) {
   if (runDebugProxy) {
     //run -c config.json -s spec/orig/swagger.json -p 4011 -m -d
     // args = ['-a=run ' + ['-c ' + Path.join(options.config, 'config.json'), '-s ' + Path.join(options.config, 'spec.json')].join(' ')]
-    args = ['run', 'main.go', 'run', '-p=4020']
+    args = ['run', 'main.go', 'run', '-p=4025']
     command = 'go'
     commandDir = process.env.GOPATH + '/src/github.com/stoplightio/go-prism'
   } else {
