@@ -256,7 +256,7 @@ autoUpdater.on('update-not-available', (e, m) => {
   }
   manualUpdateCheck = false;
 });
-autoUpdater.on('update-downloaded', (e, rNotes, rName, rDate, updateUrl, quitAndUpdate) => {
+autoUpdater.on('update-downloaded', (e, rNotes, rName, rDate, updateUrl) => {
   browserLogger('updater update-downloaded', e, rNotes, rName, rDate, updateUrl);
 
   dialog.showMessageBox(mainWindow, {
@@ -266,7 +266,7 @@ autoUpdater.on('update-downloaded', (e, rNotes, rName, rDate, updateUrl, quitAnd
     detail: '',
   }, (response) => {
     // This isn't working..
-    quitAndUpdate(); // doesn't work? have to manually quit app
+    autoUpdater.quitAndInstall(); // doesn't work? have to manually quit app
 
     if (response === 0) {
       browserLogger('quitting..');
@@ -289,6 +289,24 @@ const checkForUpdates = () => {
   lastCheck = new Date();
   autoUpdater.checkForUpdates();
 };
+
+if (process.platform !== 'linux') {
+  checkForUpdates();
+  setInterval(() => {
+    checkForUpdates();
+  }, 1000 * 60 * 30);
+
+  app.on('browser-window-focus', () => {
+    const now = new Date();
+
+    // auto check at most once every 5 minutes
+    if (lastCheck && now.getTime() - lastCheck.getTime() < 300000) {
+      return;
+    }
+
+    checkForUpdates();
+  });
+}
 
 ipcMain.on('updater.check', (event) => {
   manualUpdateCheck = true;
