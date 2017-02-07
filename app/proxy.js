@@ -109,10 +109,20 @@ function startServer(options, cb) {
     args = ['run', '-p=4020']
   }
 
-  log('starting proxy with command', commandDir, command, args)
+  let nextHost = 'http://localhost:3030'
+  if (process.env.NODE_ENV === 'staging') {
+    nextHost = 'http://api-next-staging.stoplight.io'
+  } else if (process.env.NODE_ENV === 'production') {
+    nextHost = 'https://api-next.stoplight.io'
+  }
+
+  log('starting proxy with command', commandDir, command, args, nextHost)
   server = spawn(command, args, {
-    cwd: commandDir
-  })
+    cwd: commandDir,
+    env: {
+      SL_NEXT_HOST: nextHost,
+    },
+  });
 
   server.stdout.on('data', function(data) {
     starting = false
