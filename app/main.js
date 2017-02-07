@@ -73,14 +73,17 @@ switch (process.env.NODE_ENV) {
   case 'production':
     process.env.SL_API_HOST = 'https://api-next.stoplight.io';
     process.env.SL_HOST = 'https://scenarios.stoplight.io';
+    process.env.PRISM_PORT = 4020
     break;
   case 'staging':
     process.env.SL_API_HOST = 'https://api-next-staging.stoplight.io';
     process.env.SL_HOST = 'https://next-staging.stoplight.io';
+    process.env.PRISM_PORT = 4015
     break;
   default:
     process.env.SL_API_HOST = 'http://localhost:3030';
     process.env.SL_HOST = 'http://localhost:3100';
+    process.env.PRISM_PORT = 4025
     break;
 }
 

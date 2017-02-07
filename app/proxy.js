@@ -94,7 +94,7 @@ function startServer(options, cb) {
   if (runDebugProxy) {
     //run -c config.json -s spec/orig/swagger.json -p 4011 -m -d
     // args = ['-a=run ' + ['-c ' + Path.join(options.config, 'config.json'), '-s ' + Path.join(options.config, 'spec.json')].join(' ')]
-    args = ['run', 'main.go', 'run', '-p=4025']
+    args = ['run', 'main.go', 'run', `-p=${process.env.PRISM_PORT}`]
     command = 'go'
     commandDir = process.env.GOPATH + '/src/github.com/stoplightio/go-prism'
   } else {
@@ -106,22 +106,12 @@ function startServer(options, cb) {
 
     commandDir = Path.join(__dirname, 'proxy')
     // args = ['run', '-c=./config.json', '-s=./spec.json']
-    args = ['run', '-p=4020']
+    args = ['run', `-p=${process.env.PRISM_PORT}`]
   }
 
-  let nextHost = 'http://localhost:3030'
-  if (process.env.NODE_ENV === 'staging') {
-    nextHost = 'http://api-next-staging.stoplight.io'
-  } else if (process.env.NODE_ENV === 'production') {
-    nextHost = 'https://api-next.stoplight.io'
-  }
-
-  log('starting proxy with command', commandDir, command, args, nextHost)
+  log('starting proxy with command', commandDir, command, args, process.env.SL_API_HOST)
   server = spawn(command, args, {
     cwd: commandDir,
-    env: {
-      SL_NEXT_HOST: nextHost,
-    },
   });
 
   server.stdout.on('data', function(data) {
