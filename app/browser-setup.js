@@ -26,6 +26,10 @@ global.Electron = {
   menu: Menu,
   proxyPath: Path.join(__dirname, 'proxy'),
   version: app.getVersion(),
+  events: {
+    onOpenFile: null, // app must implement this to hook into file open events
+    onOpenUrl: null, // app must implement this to hook into url open events
+  },
   defaultProxyConfig: {
     port: '4020',
     forwardHost: 'http://localhost:3000',
@@ -44,6 +48,17 @@ global.Electron = {
     },
   },
 };
+
+app.on('open-file', (file) => {
+  if (Electron.events.onOpenFile) {
+    Electron.events.onOpenFile(file);
+  }
+})
+app.on('open-url', (url) => {
+  if (Electron.events.onOpenUrl) {
+    Electron.events.onOpenUrl(url);
+  }
+})
 
 // BUILD APP MENU
 
@@ -113,6 +128,30 @@ const template = [
   {
     label: app.getName(),
     submenu: mainSubmenu,
+  },
+  {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Open...',
+        accelerator: 'CmdOrCtrl+o',
+        click() {
+          dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [
+              {name: 'JSON Files', extensions: ['json']},
+              {name: 'YAML Files', extensions: ['yaml', 'yml']},
+            ],
+          }, (filePaths) => {
+            if (filePaths) {
+              if (Electron.events.onOpenFile) {
+                Electron.events.onOpenFile(filePaths[0]);
+              }
+            }
+          });
+        },
+      },
+    ],
   },
   {
     label: 'Edit',
@@ -257,7 +296,7 @@ const template = [
 
 if (process.platform === 'darwin') {
   // Edit menu.
-  template[1].submenu.push(
+  template[2].submenu.push(
     {
       type: 'separator',
     },
@@ -275,7 +314,7 @@ if (process.platform === 'darwin') {
   );
 
   // Window menu.
-  template[3].submenu = [
+  template[4].submenu = [
     {
       label: 'Close',
       accelerator: 'CmdOrCtrl+W',
