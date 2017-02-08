@@ -293,7 +293,7 @@ const checkForUpdates = () => {
   autoUpdater.checkForUpdates();
 };
 
-if (process.platform !== 'linux') {
+if (process.env.NODE_ENV !== 'development' && process.platform !== 'linux') {
   checkForUpdates();
   setInterval(() => {
     checkForUpdates();
