@@ -207,7 +207,7 @@ const template = [
       },
       {
         label: 'Open Current URL in Browser',
-        accelerator: 'CmdOrCtrl+O',
+        accelerator: 'CmdOrCtrl+Shift+O',
         click(item, focusedWindow) {
           const contents = focusedWindow ? focusedWindow.webContents : null;
           if (contents) {
