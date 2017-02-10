@@ -17,7 +17,7 @@
   "devDependencies": {
     "adm-zip": "0.4.x",
     "del": "2.x.x",
-    "electron-builder": "12.x.x",
+    "electron-builder": "13.x.x",
     "electron-prebuilt": "1.4.x",
     "fs-extra": "2.x.x",
     "request": "2.x.x"

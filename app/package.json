@@ -1,7 +1,7 @@
 {
   "name": "Scenarios",
   "description": "The kickass APIs toolkit.",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "environment": "production",
   "homepage": "https://stoplight.io",
   "license": "UNLICENSED",
