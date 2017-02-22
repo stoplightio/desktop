@@ -84,7 +84,7 @@ function startServer(options, cb) {
   var runDebugProxy = false
   if (debug) {
     try {
-      fs.lstatSync(process.env.GOPATH + '/src/github.com/stoplightio/go-prism')
+      fs.lstatSync(process.env.GOPATH + '/src/github.com/stoplightio/bear2.0/cmd/prism')
       runDebugProxy = true
     } catch (e) {
       log('cant start in debug mode', e)
@@ -94,9 +94,9 @@ function startServer(options, cb) {
   if (runDebugProxy) {
     //run -c config.json -s spec/orig/swagger.json -p 4011 -m -d
     // args = ['-a=run ' + ['-c ' + Path.join(options.config, 'config.json'), '-s ' + Path.join(options.config, 'spec.json')].join(' ')]
-    args = ['run', 'main.go', 'run', `-p=${process.env.PRISM_PORT}`]
+    args = ['run', 'main.go', 'conduct', 'serve', `-p=${process.env.PRISM_PORT}`]
     command = 'go'
-    commandDir = process.env.GOPATH + '/src/github.com/stoplightio/go-prism'
+    commandDir = process.env.GOPATH + '/src/github.com/stoplightio/bear2.0/cmd/prism'
   } else {
     if (process.platform === 'win32') {
       command = 'prism.exe'
@@ -106,7 +106,7 @@ function startServer(options, cb) {
 
     commandDir = Path.join(__dirname, 'proxy')
     // args = ['run', '-c=./config.json', '-s=./spec.json']
-    args = ['run', `-p=${process.env.PRISM_PORT}`]
+    args = ['conduct', 'serve', `-p=${process.env.PRISM_PORT}`]
   }
 
   log('starting proxy with command', commandDir, command, args, process.env.SL_API_HOST)
