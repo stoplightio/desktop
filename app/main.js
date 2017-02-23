@@ -148,11 +148,6 @@ app.on('ready', () => {
   });
 
   mainWindow.webContents.on('new-window', (e, url, frameName, disposition) => {
-    // allow github auth through to normal electron popup so login/register works
-    if (url.match('github.com/login/oauth/authorize')) {
-      return;
-    }
-
     if (disposition === 'foreground-tab') {
       e.preventDefault();
       shell.openExternal(url);
@@ -314,4 +309,36 @@ if (process.env.NODE_ENV !== 'development' && process.platform !== 'linux') {
 ipcMain.on('updater.check', (event) => {
   manualUpdateCheck = true;
   checkForUpdates();
+});
+
+ipcMain.on('open.oauth.window', (event, provider, url) => {
+  let authWindow = new BrowserWindow({
+    width: 1020,
+    height: 666,
+    center: true,
+    show: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    title: `${provider} Authorization`,
+    webPreferences: {
+      devTools: false,
+      nodeIntegration: false,
+    }
+  });
+
+  authWindow.loadURL(url);
+  authWindow.show();
+
+  authWindow.webContents.on('did-get-redirect-request', (e, oldUrl, newUrl) => {
+    if (newUrl.indexOf('access_token') !== -1) {
+      event.sender.send('oauth.token.ready', newUrl);
+      authWindow.close();
+    }
+  });
+
+  authWindow.on('closed', () => {
+    event.sender.send('oauth.token.ready');
+    authWindow = null;
+  });
 });
