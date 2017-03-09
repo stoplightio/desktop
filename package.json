@@ -23,7 +23,6 @@
     "request": "2.x.x"
   },
   "build": {
-    "overwrite": true,
     "appId": "com.stoplight.stoplight",
     "mac": {
       "category": "public.app-category.developer-tools",
@@ -44,7 +43,6 @@
         "nsis"
       ]
     },
-    "download.strictSSL": false,
     "iconUrl": "https://s3.amazonaws.com/stoplight/icon.ico",
     "compression": "normal",
     "asar": false,
