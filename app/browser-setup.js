@@ -67,7 +67,7 @@ let mainSubmenu = [
     label: 'Check for Updates',
     click: function() {
       if (process.platform === 'linux') {
-        shell.openExternal('https://github.com/stoplightio/stoplight-app/releases/latest');
+        shell.openExternal('https://github.com/stoplightio/desktop/releases/latest');
       } else {
         ipcRenderer.send('updater.check');
       }
