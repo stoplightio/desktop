@@ -1,7 +1,7 @@
 {
   "name": "Scenarios",
   "description": "The kickass APIs toolkit.",
-  "version": "3.0.9",
+  "version": "3.0.10",
   "environment": "production",
   "homepage": "https://stoplight.io",
   "license": "Apache-2.0",
@@ -12,11 +12,11 @@
   "main": "./main.js",
   "dependencies": {
     "body-parser": "1.x.x",
-    "chokidar": "^1.6.1",
+    "chokidar": "1.6.x",
     "debug": "2.6.x",
     "electron-auto-updater": "1.0.x",
     "express": "4.x.x",
-    "fs-extra": "^2.0.0",
+    "fs-extra": "2.1.x",
     "ip": "1.x.x",
     "lodash": "4.x.x",
     "ps-tree": "1.x.x"

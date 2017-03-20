@@ -89,9 +89,7 @@ switch (process.env.NODE_ENV) {
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
-  // if (process.platform !== 'darwin') {
   app.quit();
-  // }
 });
 
 // Shutdown the servers on quit
@@ -224,9 +222,17 @@ let cancelUpdateChecks = false;
 autoUpdater.on('error', (e, m) => {
   browserLogger('updater error', e, m);
   manualUpdateCheck = false;
+
+  if (mainWindow) {
+    mainWindow.webContents.send('updater.error' , e, m);
+  }
 });
 autoUpdater.on('checking-for-update', (e, m) => {
   browserLogger('updater checking-for-update', e, m);
+
+  if (mainWindow) {
+    mainWindow.webContents.send('updater.checking-for-update' , e, m);
+  }
 });
 autoUpdater.on('update-available', (e, m) => {
   browserLogger('update-available', e, m);
@@ -236,11 +242,15 @@ autoUpdater.on('update-available', (e, m) => {
     dialog.showMessageBox(mainWindow, {
       type: 'info',
       buttons: ['OK'],
-      message: 'How\'d you know?!',
-      detail: 'There is a shiny new version of Stoplight available! It\'s downloading now, and we\'ll let you know when it\'s ready.',
+      message: 'New Version Available!',
+      detail: 'It\'s downloading now, and we\'ll let you know when it\'s ready.',
     });
   }
   manualUpdateCheck = false;
+
+  if (mainWindow) {
+    mainWindow.webContents.send('updater.update-available' , e, m);
+  }
 });
 autoUpdater.on('update-not-available', (e, m) => {
   browserLogger('updater update-not-available', e, m);
@@ -253,30 +263,18 @@ autoUpdater.on('update-not-available', (e, m) => {
     });
   }
   manualUpdateCheck = false;
+
+  if (mainWindow) {
+    mainWindow.webContents.send('updater.update-not-available' , e, m);
+  }
 });
 autoUpdater.on('update-downloaded', (e, rNotes, rName, rDate, updateUrl) => {
   browserLogger('updater update-downloaded', e, rNotes, rName, rDate, updateUrl);
 
-  dialog.showMessageBox(mainWindow, {
-    type: 'info',
-    buttons: ['OK, Quit'],
-    message: 'An update has been installed, please restart Stoplight.',
-    detail: '',
-  }, (response) => {
-    // This isn't working..
-    autoUpdater.quitAndInstall(); // doesn't work? have to manually quit app
-
-    if (response === 0) {
-      browserLogger('quitting..');
-      setTimeout(() => {
-        app.quit();
-      }, 2000);
-    }
-  });
+  if (mainWindow) {
+    mainWindow.webContents.send('updater.update-downloaded', e, rNotes, rName, rDate, updateUrl);
+  }
 });
-
-const platform = `${os.platform()}_${os.arch()}`;
-const version = app.getVersion();
 
 let lastCheck;
 const checkForUpdates = () => {
@@ -309,6 +307,10 @@ if (process.env.NODE_ENV !== 'development' && process.platform !== 'linux') {
 ipcMain.on('updater.check', (event) => {
   manualUpdateCheck = true;
   checkForUpdates();
+});
+
+ipcMain.on('updater.install', (event) => {
+  autoUpdater.quitAndInstall();
 });
 
 ipcMain.on('open.oauth.window', (event, provider, url) => {

@@ -29,6 +29,7 @@ global.Electron = {
   events: {
     onOpenFile: null, // app must implement this to hook into file open events
     onOpenUrl: null, // app must implement this to hook into url open events
+    onOpenAbout: null, // app must implement this to hook into open about
   },
   defaultProxyConfig: {
     port: '4020',
@@ -66,9 +67,11 @@ let mainSubmenu = [
   {
     label: 'Check for Updates',
     click: function() {
-      if (process.platform === 'linux') {
-        shell.openExternal('https://github.com/stoplightio/desktop/releases/latest');
-      } else {
+      if (Electron.events.onOpenAbout) {
+        Electron.events.onOpenAbout();
+      }
+
+      if (process.platform !== 'linux') {
         ipcRenderer.send('updater.check');
       }
     },
@@ -84,14 +87,21 @@ let mainSubmenu = [
 if (process.platform === 'darwin') {
   mainSubmenu = [
     {
-      role: 'about',
+      label: 'About Stoplight',
+      click: function() {
+        if (Electron.events.onOpenAbout) {
+          Electron.events.onOpenAbout();
+        }
+      },
     },
     {
       label: 'Check for Updates',
       click: function() {
-        if (process.platform === 'linux') {
-          shell.openExternal('https://github.com/stoplightio/stoplight-app/releases/latest');
-        } else {
+        if (Electron.events.onOpenAbout) {
+          Electron.events.onOpenAbout();
+        }
+
+        if (process.platform !== 'linux') {
           ipcRenderer.send('updater.check');
         }
       },

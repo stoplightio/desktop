@@ -7,8 +7,8 @@
     "start": "NODE_ENV=development electron ./app",
     "pre:build": "node build-pre",
     "post:build": "node build-post",
-    "build": "build --mac --linux --win --x64",
-    "release": "build --mac --linux --win --x64",
+    "build": "build --mac --linux --win --x64 --ia32",
+    "release": "build --mac --linux --win --x64 --ia32",
     "build:production": "NODE_ENV=production npm run pre:build && npm run build && npm run post:build",
     "build:staging": "NODE_ENV=staging npm run build",
     "release:production": "NODE_ENV=production npm run pre:build && npm run release && npm run post:build",
@@ -23,7 +23,7 @@
     "request": "2.x.x"
   },
   "build": {
-    "appId": "com.stoplight.stoplight",
+    "appId": "com.stoplight.app",
     "mac": {
       "category": "public.app-category.developer-tools",
       "target": [
@@ -34,7 +34,6 @@
     "linux": {
       "category": "Development",
       "target": [
-        "AppImage",
         "deb"
       ]
     },
