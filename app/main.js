@@ -313,6 +313,8 @@ ipcMain.on('updater.install', (event) => {
   autoUpdater.quitAndInstall();
 });
 
+// OAUTH
+
 ipcMain.on('open.oauth.window', (event, provider, url) => {
   let authWindow = new BrowserWindow({
     width: 1020,
@@ -343,4 +345,14 @@ ipcMain.on('open.oauth.window', (event, provider, url) => {
     event.sender.send('oauth.token.ready');
     authWindow = null;
   });
+});
+
+// DEEP LINKING
+
+app.setAsDefaultProtocolClient('stoplight');
+
+app.on('open-url', function (event, url) {
+  if (mainWindow) {
+    mainWindow.show();
+  }
 });

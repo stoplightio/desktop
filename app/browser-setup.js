@@ -50,14 +50,14 @@ global.Electron = {
   },
 };
 
-app.on('open-file', (file) => {
+app.on('open-file', (e, path) => {
   if (Electron.events.onOpenFile) {
-    Electron.events.onOpenFile(file);
+    Electron.events.onOpenFile(e, path);
   }
 })
-app.on('open-url', (url) => {
+app.on('open-url', (e, url) => {
   if (Electron.events.onOpenUrl) {
-    Electron.events.onOpenUrl(url);
+    Electron.events.onOpenUrl(e, url);
   }
 })
 

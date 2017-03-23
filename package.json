@@ -25,6 +25,12 @@
   "build": {
     "appId": "com.stoplight.app",
     "mac": {
+      "extendInfo": {
+        "CFBundleURLTypes": [{
+          "CFBundleURLSchemes": ["stoplight"],
+          "CFBundleURLName": "Stoplight Protocol"
+        }]
+      },
       "category": "public.app-category.developer-tools",
       "target": [
         "dmg",
