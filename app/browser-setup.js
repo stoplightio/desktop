@@ -155,7 +155,7 @@ const template = [
           }, (filePaths) => {
             if (filePaths) {
               if (Electron.events.onOpenFile) {
-                Electron.events.onOpenFile(filePaths[0]);
+                Electron.events.onOpenFile(null, filePaths[0]);
               }
             }
           });
