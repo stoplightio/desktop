@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const electron = require('electron');
 const autoUpdater = require('electron-auto-updater').autoUpdater;
 const Path = require('path');
@@ -5,12 +6,68 @@ const ProxyServer = require('./proxy');
 const os = require('os');
 const pjson = require('./package.json');
 const api = require('./api');
+const url = require('url');
 
 const {app, ipcMain, BrowserWindow, dialog, shell} = electron;
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the javascript object is GCed.
-let mainWindow = null;
+// PROXY SERVERS
+
+// respect any explicitly set proxies
+const proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+let parsedProxyUrl;
+if (proxyUrl) {
+  console.info('Using proxyUrl', proxyUrl);
+
+  try {
+    parsedProxyUrl = url.parse(proxyUrl);
+    app.commandLine.appendSwitch('proxy-server', parsedProxyUrl.protocol + '//' + parsedProxyUrl.host);
+  } catch (e) {
+    console.error('invalid proxyUrl', e);
+  }
+}
+
+// respect explicitly set proxy bypass
+const bypassList = process.env.NO_PROXY || process.env.no_proxy;
+if (bypassList) {
+  console.info('Using bypassList', bypassList);
+  app.commandLine.appendSwitch('proxy-bypass-list', bypassList.replace(/,/g, ';'));
+} else if (proxyUrl) {
+  console.info('Using bypassList', '<local>');
+  app.commandLine.appendSwitch('proxy-bypass-list', '<local>');
+}
+
+app.on('login', function(event, webContents, request, authInfo, callback) {
+  event.preventDefault();
+
+  console.info('proxyUrl requires basic auth');
+
+  const auth = _.get(parsedProxyUrl, 'auth', '');
+  const authParts = (auth || '').split(':');
+  const authUsername = _.first(authParts) || process.env.HTTPS_PROXY_USERNAME || process.env.https_proxy_username || process.env.HTTP_PROXY_USERNAME || process.env.http_proxy_username;
+  const authPassword = _.last(authParts) || process.env.HTTPS_PROXY_PASSWORD || process.env.https_proxy_password || process.env.HTTP_PROXY_PASSWORD || process.env.http_proxy_password;
+
+  if (!authUsername || !authPassword) {
+    const errorMsg = `No basic auth info provided.
+
+Either include it in your proxyUrl:
+{http|https}://{username}:{password}@{host}:{port}
+
+Or set the HTTP_PROXY_USERNAME and HTTP_PROXY_PASSWORD environment variables.`;
+
+    if (mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'error',
+        buttons: ['OK'],
+        message: `Error connecting to designated proxy ${proxyUrl}`,
+        detail: errorMsg,
+      });
+    }
+
+    console.error(errorMsg);
+  } else {
+    callback(authUsername, authPassword);
+  }
+})
 
 // API
 
@@ -22,6 +79,10 @@ api.start();
 // easy to leak!
 //
 // https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments
+
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the javascript object is GCed.
+let mainWindow = null;
 
 const _log = function(baseArgs, args) {
   if (mainWindow && mainWindow !== null) {
