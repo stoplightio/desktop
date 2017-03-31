@@ -125,6 +125,7 @@ const HostEditor = React.createClass({
               <Form.Field
                 label='Proxy Basic Auth Pass'
                 name='proxy.pass'
+                type='password'
                 placeholder={window.Electron.env.HTTPS_PROXY_PASS || window.Electron.env.https_proxy_pass || window.Electron.env.HTTP_PROXY_PASS || window.Electron.env.http_proxy_password || ''}
                 value={_.get(host, ['proxy', 'pass'], '')}
                 control='input'

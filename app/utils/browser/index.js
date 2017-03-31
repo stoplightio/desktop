@@ -66,6 +66,20 @@ let mainSubmenu = [
     type: 'separator',
   },
   {
+    label: 'Preferences',
+    submenu: [
+      {
+        label: 'Hosts Configuration',
+        click() {
+          ipcRenderer.send('app.showSettings');
+        },
+      }
+    ]
+  },
+  {
+    type: 'separator',
+  },
+  {
     role: 'quit',
   },
 ];
