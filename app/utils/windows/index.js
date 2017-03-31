@@ -2,6 +2,7 @@ const _ = require('lodash');
 const electron = require('electron');
 const Path = require('path');
 const request = require('request');
+const windowStateKeeper = require('electron-window-state');
 
 const api = require('../api');
 const config = require('../config');
@@ -25,10 +26,17 @@ exports.createWindow = ({targetWindow, host, showSettings}) => {
   const {screen} = electron;
   const size = screen.getPrimaryDisplay().workAreaSize;
 
+  let mainWindowState = windowStateKeeper({
+    defaultWidth: parseInt(size.width * 0.98),
+    defaultHeight: parseInt(size.height * 0.96),
+  });
+
   // Create the browser window.
   mainWindow = targetWindow || new BrowserWindow({
-    width: parseInt(size.width * 0.98),
-    height: parseInt(size.height * 0.96),
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     center: true,
     titleBarStyle: 'hidden',
     backgroundColor: '#3B99FC',
@@ -37,6 +45,8 @@ exports.createWindow = ({targetWindow, host, showSettings}) => {
       preload: Path.resolve(Path.join(__dirname, '..', 'browser', 'index.js')),
     },
   });
+
+  mainWindowState.manage(mainWindow);
 
   if (showSettings) {
     mainWindow.loadURL(exports.internalUrl);

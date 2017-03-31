@@ -1,7 +1,7 @@
 {
   "name": "Scenarios",
   "description": "The kickass APIs toolkit.",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "environment": "production",
   "homepage": "./",
   "license": "Apache-2.0",
@@ -15,7 +15,8 @@
     "chokidar": "1.6.x",
     "debug": "2.6.x",
     "electron-auto-updater": "1.0.x",
-    "electron-config": "^0.2.1",
+    "electron-config": "0.2.x",
+    "electron-window-state": "4.1.x",
     "express": "4.x.x",
     "fs-extra": "2.1.x",
     "ip": "1.x.x",
@@ -24,7 +25,7 @@
     "react": "15.4.x",
     "react-dom": "15.4.x",
     "request": "2.81.x",
-    "semantic-ui-react": "^0.67.2"
+    "semantic-ui-react": "0.67.x"
   },
   "devDependencies": {
     "react-scripts": "0.9.x"
