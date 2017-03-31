@@ -3,7 +3,7 @@
   "description": "The kickass APIs toolkit.",
   "version": "3.1.1",
   "environment": "production",
-  "homepage": "https://stoplight.io",
+  "homepage": "./",
   "license": "Apache-2.0",
   "author": {
     "name": "Stoplight",
@@ -15,10 +15,24 @@
     "chokidar": "1.6.x",
     "debug": "2.6.x",
     "electron-auto-updater": "1.0.x",
+    "electron-config": "^0.2.1",
     "express": "4.x.x",
     "fs-extra": "2.1.x",
     "ip": "1.x.x",
     "lodash": "4.x.x",
-    "ps-tree": "1.x.x"
+    "ps-tree": "1.x.x",
+    "react": "15.4.x",
+    "react-dom": "15.4.x",
+    "request": "2.81.x",
+    "semantic-ui-react": "^0.67.2"
+  },
+  "devDependencies": {
+    "react-scripts": "0.9.x"
+  },
+  "scripts": {
+    "start": "BROWSER=none react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
   }
 }

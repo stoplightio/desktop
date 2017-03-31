@@ -2,72 +2,35 @@ const _ = require('lodash');
 const electron = require('electron');
 const autoUpdater = require('electron-auto-updater').autoUpdater;
 const Path = require('path');
-const ProxyServer = require('./proxy');
 const os = require('os');
-const pjson = require('./package.json');
-const api = require('./api');
 const url = require('url');
+const request = require('request');
+
+const pjson = require('./package.json');
+const PrismServer = require('./utils/prism');
+const api = require('./utils/api');
 
 const {app, ipcMain, BrowserWindow, dialog, shell} = electron;
 
-// PROXY SERVERS
-
-// respect any explicitly set proxies
-const proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
-let parsedProxyUrl;
-if (proxyUrl) {
-  console.info('Using proxyUrl', proxyUrl);
-
-  try {
-    parsedProxyUrl = url.parse(proxyUrl);
-    app.commandLine.appendSwitch('proxy-server', parsedProxyUrl.protocol + '//' + parsedProxyUrl.host);
-  } catch (e) {
-    console.error('invalid proxyUrl', e);
-  }
+// Set base process vars
+process.env.NODE_ENV = process.env.NODE_ENV || pjson.environment || 'development';
+switch (process.env.NODE_ENV) {
+  case 'production':
+    process.env.SL_HOST = 'https://scenarios.stoplight.io';
+    process.env.SL_API_HOST = 'https://api-next.stoplight.io';
+    process.env.PRISM_PORT = 4020;
+    break;
+  case 'staging':
+    process.env.SL_HOST = 'https://next-staging.stoplight.io';
+    process.env.SL_API_HOST = 'https://api-next-staging.stoplight.io';
+    process.env.PRISM_PORT = 4015;
+    break;
+  default:
+    process.env.SL_HOST = 'http://localhost:3100';
+    process.env.SL_API_HOST = 'http://localhost:3030';
+    process.env.PRISM_PORT = 4025;
+    break;
 }
-
-// respect explicitly set proxy bypass
-const bypassList = process.env.NO_PROXY || process.env.no_proxy;
-if (bypassList) {
-  console.info('Using bypassList', bypassList);
-  app.commandLine.appendSwitch('proxy-bypass-list', bypassList.replace(/,/g, ';'));
-} else if (proxyUrl) {
-  console.info('Using bypassList', '<local>');
-  app.commandLine.appendSwitch('proxy-bypass-list', '<local>');
-}
-
-app.on('login', function(event, webContents, request, authInfo, callback) {
-  event.preventDefault();
-
-  console.info('proxyUrl requires basic auth');
-
-  const auth = _.get(parsedProxyUrl, 'auth', '');
-  const authParts = (auth || '').split(':');
-  const authUsername = _.first(authParts) || process.env.HTTPS_PROXY_USERNAME || process.env.https_proxy_username || process.env.HTTP_PROXY_USERNAME || process.env.http_proxy_username;
-  const authPassword = _.last(authParts) || process.env.HTTPS_PROXY_PASSWORD || process.env.https_proxy_password || process.env.HTTP_PROXY_PASSWORD || process.env.http_proxy_password;
-
-  if (!authUsername || !authPassword) {
-    const errorMsg = `No basic auth info provided.
-
-Either include it in your proxyUrl:
-{http|https}://{username}:{password}@{host}:{port}
-
-Or set the HTTP_PROXY_USERNAME and HTTP_PROXY_PASSWORD environment variables.`;
-
-    if (mainWindow) {
-      dialog.showMessageBox(mainWindow, {
-        type: 'error',
-        buttons: ['OK'],
-        message: `Error connecting to designated proxy ${proxyUrl}`,
-        detail: errorMsg,
-      });
-    }
-
-    console.error(errorMsg);
-  } else {
-    callback(authUsername, authPassword);
-  }
-})
 
 // API
 
@@ -122,31 +85,12 @@ const proxyLogger = function() {
 
 // END LOGGING
 
-ProxyServer.setLogger(proxyLogger);
+PrismServer.setLogger(proxyLogger);
 api.setLogger(browserLogger);
 
 // Report crashes to our server.
 // https://github.com/atom/electron/blob/master/docsapi/crash-reporter.md
 // require('crash-reporter').start()
-
-process.env.NODE_ENV = process.env.NODE_ENV || pjson.environment || 'development';
-switch (process.env.NODE_ENV) {
-  case 'production':
-    process.env.SL_API_HOST = 'https://api-next.stoplight.io';
-    process.env.SL_HOST = 'https://scenarios.stoplight.io';
-    process.env.PRISM_PORT = 4020
-    break;
-  case 'staging':
-    process.env.SL_API_HOST = 'https://api-next-staging.stoplight.io';
-    process.env.SL_HOST = 'https://next-staging.stoplight.io';
-    process.env.PRISM_PORT = 4015
-    break;
-  default:
-    process.env.SL_API_HOST = 'http://localhost:3030';
-    process.env.SL_HOST = 'http://localhost:3100';
-    process.env.PRISM_PORT = 4025
-    break;
-}
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -158,7 +102,7 @@ let serversStopped = false;
 app.on('will-quit', (event) => {
   if (!serversStopped) {
     event.preventDefault();
-    ProxyServer.stop(() => {
+    PrismServer.stop(() => {
       serversStopped = true;
       setTimeout(() => {
         app.quit();
@@ -167,71 +111,33 @@ app.on('will-quit', (event) => {
   }
 });
 
+
+const windows = require('./utils/windows');
+const hosts = require('./utils/hosts');
+const config = require('./utils/config');
+
+let host;
+try {
+  host = config.currentHost();
+  hosts.initHost({app, host});
+} catch (e) {
+  config.data.set('hostError', String(e));
+}
+
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.
 app.on('ready', () => {
-  const {screen} = electron;
-  const size = screen.getPrimaryDisplay().workAreaSize;
-
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: parseInt(size.width * 0.98),
-    height: parseInt(size.height * 0.96),
-    center: true,
-    titleBarStyle: 'hidden',
-    webPreferences: {
-      webSecurity: false,
-      preload: Path.resolve(Path.join(__dirname, 'browser-setup.js')),
-    },
-  });
-
-  // and load the index.html of the app.
-  mainWindow.loadURL(process.env.SL_HOST);
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-    api.setMainWindow(null);
-  });
-
-  api.setMainWindow(mainWindow);
-
-  // Emitted when the window regains focus.
-  mainWindow.on('focus', () => {
-    if (mainWindow) {
-      mainWindow.webContents.send('window.focus');
-    }
-  });
-
-  mainWindow.webContents.on('new-window', (e, url, frameName, disposition) => {
-    if (disposition === 'foreground-tab') {
-      e.preventDefault();
-      shell.openExternal(url);
-    }
-  });
-
-  mainWindow.on('swipe', (e, direction) => {
-    if (!mainWindow) {
-      return;
-    }
-
-    switch (direction) {
-      case 'left':
-        if (mainWindow && mainWindow.webContents.canGoBack()) {
-          mainWindow.webContents.goBack();
-        }
-        break;
-      case 'right':
-        if (mainWindow && mainWindow.webContents.canGoForward()) {
-          mainWindow.webContents.goForward();
-        }
-        break;
-    }
-  });
+  windows.createWindow({host});
 });
+
+ipcMain.on('app.relaunch', () => {
+  app.relaunch();
+  app.quit();
+});
+
+ipcMain.on('app.showSettings', () => {
+  windows.createWindow({targetWindow: windows.getMainWindow(), host, showSettings: true});
+})
 
 //
 // Events available to the browser
@@ -239,11 +145,11 @@ app.on('ready', () => {
 
 ipcMain.on('proxy.start', (event, options, env) => {
   try {
-    ProxyServer.start(options, () => {
+    PrismServer.start(options, () => {
       event.sender.send('proxy.start.resolve');
     }, (code) => {
-      if (mainWindow) {
-        mainWindow.webContents.send('proxy.stopped', code);
+      if (windows.getMainWindow()) {
+        windows.getMainWindow().webContents.send('proxy.stopped', code);
       }
     });
   } catch (e) {
@@ -254,7 +160,7 @@ ipcMain.on('proxy.start', (event, options, env) => {
 
 ipcMain.on('proxy.stop', (event) => {
   try {
-    ProxyServer.stop(() => {
+    PrismServer.stop(() => {
       event.sender.send('proxy.stop.resolve');
     });
   } catch (e) {
@@ -264,14 +170,14 @@ ipcMain.on('proxy.stop', (event) => {
 });
 
 ipcMain.on('setTitle', (event, title) => {
-  if (mainWindow) {
-    mainWindow.setTitle(title);
+  if (windows.getMainWindow()) {
+    windows.getMainWindow().setTitle(title);
   }
 });
 
 ipcMain.on('setTitle', (event, title) => {
-  if (mainWindow) {
-    mainWindow.setTitle(title);
+  if (windows.getMainWindow()) {
+    windows.getMainWindow().setTitle(title);
   }
 });
 
@@ -284,15 +190,15 @@ autoUpdater.on('error', (e, m) => {
   browserLogger('updater error', e, m);
   manualUpdateCheck = false;
 
-  if (mainWindow) {
-    mainWindow.webContents.send('updater.error' , e, m);
+  if (windows.getMainWindow()) {
+    windows.getMainWindow().webContents.send('updater.error' , e, m);
   }
 });
 autoUpdater.on('checking-for-update', (e, m) => {
   browserLogger('updater checking-for-update', e, m);
 
-  if (mainWindow) {
-    mainWindow.webContents.send('updater.checking-for-update' , e, m);
+  if (windows.getMainWindow()) {
+    windows.getMainWindow().webContents.send('updater.checking-for-update' , e, m);
   }
 });
 autoUpdater.on('update-available', (e, m) => {
@@ -300,7 +206,7 @@ autoUpdater.on('update-available', (e, m) => {
   cancelUpdateChecks = true;
 
   if (manualUpdateCheck) {
-    dialog.showMessageBox(mainWindow, {
+    dialog.showMessageBox(windows.getMainWindow(), {
       type: 'info',
       buttons: ['OK'],
       message: 'New Version Available!',
@@ -309,14 +215,14 @@ autoUpdater.on('update-available', (e, m) => {
   }
   manualUpdateCheck = false;
 
-  if (mainWindow) {
-    mainWindow.webContents.send('updater.update-available' , e, m);
+  if (windows.getMainWindow()) {
+    windows.getMainWindow().webContents.send('updater.update-available' , e, m);
   }
 });
 autoUpdater.on('update-not-available', (e, m) => {
   browserLogger('updater update-not-available', e, m);
   if (manualUpdateCheck) {
-    dialog.showMessageBox(mainWindow, {
+    dialog.showMessageBox(windows.getMainWindow(), {
       type: 'info',
       buttons: ['OK'],
       message: 'Thumbs Up',
@@ -325,15 +231,15 @@ autoUpdater.on('update-not-available', (e, m) => {
   }
   manualUpdateCheck = false;
 
-  if (mainWindow) {
-    mainWindow.webContents.send('updater.update-not-available' , e, m);
+  if (windows.getMainWindow()) {
+    windows.getMainWindow().webContents.send('updater.update-not-available' , e, m);
   }
 });
 autoUpdater.on('update-downloaded', (e, rNotes, rName, rDate, updateUrl) => {
   browserLogger('updater update-downloaded', e, rNotes, rName, rDate, updateUrl);
 
-  if (mainWindow) {
-    mainWindow.webContents.send('updater.update-downloaded', e, rNotes, rName, rDate, updateUrl);
+  if (windows.getMainWindow()) {
+    windows.getMainWindow().webContents.send('updater.update-downloaded', e, rNotes, rName, rDate, updateUrl);
   }
 });
 
@@ -413,7 +319,7 @@ ipcMain.on('open.oauth.window', (event, provider, url) => {
 app.setAsDefaultProtocolClient('stoplight');
 
 app.on('open-url', function (event, url) {
-  if (mainWindow) {
-    mainWindow.show();
+  if (windows.getMainWindow()) {
+    windows.getMainWindow().show();
   }
 });

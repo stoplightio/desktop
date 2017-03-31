@@ -4,13 +4,15 @@
     "url": "git+https://github.com/stoplightio/desktop.git"
   },
   "scripts": {
-    "start": "NODE_ENV=development electron ./app",
+    "start": "NODE_ENV=development nf start",
+    "electron": "electron ./app",
     "pre:build": "node build-pre",
     "post:build": "node build-post",
-    "build": "build --mac --linux --win --x64 --ia32",
+    "build": " npm run build:app && build --mac --linux --win --x64 --ia32",
+    "build:app": "cd app && npm run build",
     "release": "build --mac --linux --win --x64 --ia32",
     "build:production": "NODE_ENV=production npm run pre:build && npm run build && npm run post:build",
-    "build:staging": "NODE_ENV=staging npm run build",
+    "build:staging": "NODE_ENV=staging npm run pre:build && npm run build && npm run post:build",
     "release:production": "NODE_ENV=production npm run pre:build && npm run release && npm run post:build",
     "release:staging": "NODE_ENV=staging npm run pre:build && npm run release && npm run post:build"
   },
@@ -18,7 +20,8 @@
     "adm-zip": "0.4.x",
     "del": "2.x.x",
     "electron": "1.6.x",
-    "electron-builder": "15.x.x",
+    "electron-builder": "16.x.x",
+    "foreman": "2.0.x",
     "fs-extra": "2.x.x",
     "request": "2.x.x"
   },
@@ -26,10 +29,14 @@
     "appId": "com.stoplight.app",
     "mac": {
       "extendInfo": {
-        "CFBundleURLTypes": [{
-          "CFBundleURLSchemes": ["stoplight"],
-          "CFBundleURLName": "Stoplight Protocol"
-        }]
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "stoplight"
+            ],
+            "CFBundleURLName": "Stoplight Protocol"
+          }
+        ]
       },
       "category": "public.app-category.developer-tools",
       "target": [
@@ -48,7 +55,6 @@
         "nsis"
       ]
     },
-    "iconUrl": "https://s3.amazonaws.com/stoplight/icon.ico",
     "compression": "normal",
     "asar": false,
     "extraResources": [

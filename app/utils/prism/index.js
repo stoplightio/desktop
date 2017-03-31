@@ -104,7 +104,7 @@ function startServer(options, cb) {
       command = './prism'
     }
 
-    commandDir = Path.join(__dirname, 'proxy')
+    commandDir = Path.join(__dirname, '..', '..', 'proxy')
     // args = ['run', '-c=./config.json', '-s=./spec.json']
     args = ['conduct', 'serve', `-p=${process.env.PRISM_PORT}`]
   }

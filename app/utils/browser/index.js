@@ -8,7 +8,8 @@ const {ipcRenderer, remote, clipboard} = electron;
 const {app, Menu, shell, dialog} = remote;
 const dataPath = app.getPath('appData');
 
-const api = remote.require('./api');
+const config = remote.require('./utils/config');
+const api = remote.require('./utils/api');
 
 // The values available to our dashboard
 global.Electron = {
@@ -21,6 +22,8 @@ global.Electron = {
   shell,
   dialog,
   fileWatcher,
+  env: process.env,
+  config: config.data,
   ipc: ipcRenderer,
   path: Path,
   menu: Menu,
@@ -30,23 +33,6 @@ global.Electron = {
     onOpenFile: null, // app must implement this to hook into file open events
     onOpenUrl: null, // app must implement this to hook into url open events
     onOpenAbout: null, // app must implement this to hook into open about
-  },
-  defaultProxyConfig: {
-    port: '4020',
-    forwardHost: 'http://localhost:3000',
-    log: true,
-    debug: true,
-    learn: false,
-    mock: {
-      enabled: false,
-      dynamic: false,
-    },
-    cors: false,
-    logLocation: api.getHost(),
-    blacklist: {
-      headers: [],
-      queryString: [],
-    },
   },
 };
 
@@ -105,6 +91,20 @@ if (process.platform === 'darwin') {
           ipcRenderer.send('updater.check');
         }
       },
+    },
+    {
+      type: 'separator',
+    },
+    {
+      label: 'Preferences',
+      submenu: [
+        {
+          label: 'Hosts Configuration',
+          click() {
+            ipcRenderer.send('app.showSettings');
+          },
+        }
+      ]
     },
     {
       type: 'separator',
