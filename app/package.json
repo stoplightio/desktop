@@ -22,10 +22,10 @@
     "ip": "1.x.x",
     "lodash": "4.x.x",
     "ps-tree": "1.x.x",
-    "react": "15.4.x",
-    "react-dom": "15.4.x",
+    "react": "15.5.x",
+    "react-dom": "15.5.x",
     "request": "2.81.x",
-    "semantic-ui-react": "0.67.x"
+    "semantic-ui-react": "0.68.x"
   },
   "devDependencies": {
     "react-scripts": "0.9.x"

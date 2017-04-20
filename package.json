@@ -20,7 +20,7 @@
     "adm-zip": "0.4.x",
     "del": "2.x.x",
     "electron": "1.6.x",
-    "electron-builder": "16.x.x",
+    "electron-builder": "17.x.x",
     "foreman": "2.0.x",
     "fs-extra": "2.x.x",
     "request": "2.x.x"

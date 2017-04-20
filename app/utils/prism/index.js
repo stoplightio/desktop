@@ -109,6 +109,7 @@ function startServer(options, cb) {
     args = ['conduct', 'serve', `-p=${process.env.PRISM_PORT}`]
   }
 
+  console.log('starting proxy with command', commandDir, command, args, process.env.SL_API_HOST)
   log('starting proxy with command', commandDir, command, args, process.env.SL_API_HOST)
   server = spawn(command, args, {
     cwd: commandDir,
@@ -130,6 +131,7 @@ function startServer(options, cb) {
     }
   })
   server.on('close', function(code) {
+    console.log('killed with code', code);
     if (onClose) {
       onClose(code)
     }
