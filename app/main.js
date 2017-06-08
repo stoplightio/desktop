@@ -10,7 +10,7 @@ const pjson = require('./package.json');
 const PrismServer = require('./utils/prism');
 const api = require('./utils/api');
 
-const {app, ipcMain, BrowserWindow, dialog, shell} = electron;
+const { app, ipcMain, BrowserWindow, dialog, shell } = electron;
 
 // Set base process vars
 process.env.NODE_ENV = process.env.NODE_ENV || pjson.environment || 'development';
@@ -99,7 +99,7 @@ app.on('window-all-closed', () => {
 
 // Shutdown the servers on quit
 let serversStopped = false;
-app.on('will-quit', (event) => {
+app.on('will-quit', event => {
   if (!serversStopped) {
     event.preventDefault();
     PrismServer.stop(() => {
@@ -111,7 +111,6 @@ app.on('will-quit', (event) => {
   }
 });
 
-
 const windows = require('./utils/windows');
 const hosts = require('./utils/hosts');
 const config = require('./utils/config');
@@ -119,7 +118,7 @@ const config = require('./utils/config');
 let host;
 try {
   host = config.currentHost();
-  hosts.initHost({app, host});
+  hosts.initHost({ app, host });
 } catch (e) {
   config.data.set('hostError', String(e));
 }
@@ -127,7 +126,7 @@ try {
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.
 app.on('ready', () => {
-  windows.createWindow({host});
+  windows.createWindow({ host });
 });
 
 ipcMain.on('app.relaunch', () => {
@@ -136,8 +135,8 @@ ipcMain.on('app.relaunch', () => {
 });
 
 ipcMain.on('app.showSettings', () => {
-  windows.createWindow({targetWindow: windows.getMainWindow(), host, showSettings: true});
-})
+  windows.createWindow({ targetWindow: windows.getMainWindow(), host, showSettings: true });
+});
 
 //
 // Events available to the browser
@@ -145,20 +144,24 @@ ipcMain.on('app.showSettings', () => {
 
 ipcMain.on('proxy.start', (event, options, env) => {
   try {
-    PrismServer.start(options, () => {
-      event.sender.send('proxy.start.resolve');
-    }, (code) => {
-      if (windows.getMainWindow()) {
-        windows.getMainWindow().webContents.send('proxy.stopped', code);
+    PrismServer.start(
+      options,
+      () => {
+        event.sender.send('proxy.start.resolve');
+      },
+      code => {
+        if (windows.getMainWindow()) {
+          windows.getMainWindow().webContents.send('proxy.stopped', code);
+        }
       }
-    });
+    );
   } catch (e) {
     console.log('error initializing proxy server', e);
     event.sender.send('proxy.start.reject');
   }
 });
 
-ipcMain.on('proxy.stop', (event) => {
+ipcMain.on('proxy.stop', event => {
   try {
     PrismServer.stop(() => {
       event.sender.send('proxy.stop.resolve');
@@ -191,14 +194,14 @@ autoUpdater.on('error', (e, m) => {
   manualUpdateCheck = false;
 
   if (windows.getMainWindow()) {
-    windows.getMainWindow().webContents.send('updater.error' , e, m);
+    windows.getMainWindow().webContents.send('updater.error', e, m);
   }
 });
 autoUpdater.on('checking-for-update', (e, m) => {
   browserLogger('updater checking-for-update', e, m);
 
   if (windows.getMainWindow()) {
-    windows.getMainWindow().webContents.send('updater.checking-for-update' , e, m);
+    windows.getMainWindow().webContents.send('updater.checking-for-update', e, m);
   }
 });
 autoUpdater.on('update-available', (e, m) => {
@@ -210,13 +213,13 @@ autoUpdater.on('update-available', (e, m) => {
       type: 'info',
       buttons: ['OK'],
       message: 'New Version Available!',
-      detail: 'It\'s downloading now, and we\'ll let you know when it\'s ready.',
+      detail: "It's downloading now, and we'll let you know when it's ready.",
     });
   }
   manualUpdateCheck = false;
 
   if (windows.getMainWindow()) {
-    windows.getMainWindow().webContents.send('updater.update-available' , e, m);
+    windows.getMainWindow().webContents.send('updater.update-available', e, m);
   }
 });
 autoUpdater.on('update-not-available', (e, m) => {
@@ -232,14 +235,16 @@ autoUpdater.on('update-not-available', (e, m) => {
   manualUpdateCheck = false;
 
   if (windows.getMainWindow()) {
-    windows.getMainWindow().webContents.send('updater.update-not-available' , e, m);
+    windows.getMainWindow().webContents.send('updater.update-not-available', e, m);
   }
 });
 autoUpdater.on('update-downloaded', (e, rNotes, rName, rDate, updateUrl) => {
   browserLogger('updater update-downloaded', e, rNotes, rName, rDate, updateUrl);
 
   if (windows.getMainWindow()) {
-    windows.getMainWindow().webContents.send('updater.update-downloaded', e, rNotes, rName, rDate, updateUrl);
+    windows
+      .getMainWindow()
+      .webContents.send('updater.update-downloaded', e, rNotes, rName, rDate, updateUrl);
   }
 });
 
@@ -271,12 +276,12 @@ if (process.env.NODE_ENV !== 'development' && process.platform !== 'linux') {
   });
 }
 
-ipcMain.on('updater.check', (event) => {
+ipcMain.on('updater.check', event => {
   manualUpdateCheck = true;
   checkForUpdates();
 });
 
-ipcMain.on('updater.install', (event) => {
+ipcMain.on('updater.install', event => {
   autoUpdater.quitAndInstall();
 });
 
@@ -295,7 +300,7 @@ ipcMain.on('open.oauth.window', (event, provider, url) => {
     webPreferences: {
       devTools: false,
       nodeIntegration: false,
-    }
+    },
   });
 
   authWindow.loadURL(url);
@@ -318,7 +323,7 @@ ipcMain.on('open.oauth.window', (event, provider, url) => {
 
 app.setAsDefaultProtocolClient('stoplight');
 
-app.on('open-url', function (event, url) {
+app.on('open-url', function(event, url) {
   if (windows.getMainWindow()) {
     windows.getMainWindow().show();
   }

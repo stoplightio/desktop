@@ -19,10 +19,10 @@
   "devDependencies": {
     "adm-zip": "0.4.x",
     "del": "2.x.x",
-    "electron": "1.6.x",
-    "electron-builder": "17.x.x",
+    "electron": "^1.6.11",
+    "electron-builder": "^18.7.0",
     "foreman": "2.0.x",
-    "fs-extra": "2.x.x",
+    "fs-extra": "3.x.x",
     "request": "2.x.x"
   },
   "build": {
@@ -47,7 +47,8 @@
     "linux": {
       "category": "Development",
       "target": [
-        "deb"
+        "deb",
+        "AppImage"
       ]
     },
     "win": {
