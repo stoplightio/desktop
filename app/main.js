@@ -8,7 +8,7 @@ const request = require('request');
 
 const pjson = require('./package.json');
 const PrismServer = require('./utils/prism');
-const api = require('./utils/api');
+const ApiServer = require('./utils/api');
 
 const { app, ipcMain, BrowserWindow, dialog, shell } = electron;
 
@@ -34,7 +34,7 @@ switch (process.env.NODE_ENV) {
 
 // API
 
-api.start();
+ApiServer.start();
 
 // LOGGING
 
@@ -43,13 +43,14 @@ api.start();
 //
 // https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the javascript object is GCed.
-let mainWindow = null;
-
 const _log = function(baseArgs, args) {
-  if (mainWindow && mainWindow !== null) {
-    mainWindow.webContents.send.apply(mainWindow.webContents, baseArgs.concat([].slice.call(args)));
+  if (windows.getMainWindow()) {
+    windows
+      .getMainWindow()
+      .webContents.send.apply(
+        windows.getMainWindow().webContents,
+        baseArgs.concat([].slice.call(args))
+      );
   }
 
   // garbage
@@ -60,7 +61,7 @@ const _log = function(baseArgs, args) {
 // This function sends messages to the mainWindow, to log stuff in developer tools
 const browserLoggerBaseArgs = ['console.log'];
 const browserLogger = function() {
-  if (mainWindow && mainWindow !== null) {
+  if (windows.getMainWindow()) {
     const args = new Array(arguments.length);
     for (let i = 0; i < args.length; ++i) {
       // i is always valid index in the arguments object
@@ -72,7 +73,7 @@ const browserLogger = function() {
 
 const proxyLoggerBaseArgs = ['proxy.log'];
 const proxyLogger = function() {
-  if (mainWindow && mainWindow !== null) {
+  if (windows.getMainWindow()) {
     const args = new Array(arguments.length);
     for (let i = 0; i < args.length; ++i) {
       // i is always valid index in the arguments object
@@ -86,7 +87,7 @@ const proxyLogger = function() {
 // END LOGGING
 
 PrismServer.setLogger(proxyLogger);
-api.setLogger(browserLogger);
+ApiServer.setLogger(browserLogger);
 
 // Report crashes to our server.
 // https://github.com/atom/electron/blob/master/docsapi/crash-reporter.md

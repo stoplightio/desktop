@@ -4,8 +4,8 @@ const fs = require('fs-extra');
 const electron = require('electron');
 const fileWatcher = require('chokidar');
 
-const {ipcRenderer, remote, clipboard} = electron;
-const {app, Menu, shell, dialog} = remote;
+const { ipcRenderer, remote, clipboard } = electron;
+const { app, Menu, shell, dialog } = remote;
 const dataPath = app.getPath('appData');
 
 const config = remote.require('./utils/config');
@@ -40,12 +40,12 @@ app.on('open-file', (e, path) => {
   if (Electron.events.onOpenFile) {
     Electron.events.onOpenFile(e, path);
   }
-})
+});
 app.on('open-url', (e, url) => {
   if (Electron.events.onOpenUrl) {
     Electron.events.onOpenUrl(e, url);
   }
-})
+});
 
 // BUILD APP MENU
 
@@ -73,8 +73,8 @@ let mainSubmenu = [
         click() {
           ipcRenderer.send('app.showSettings');
         },
-      }
-    ]
+      },
+    ],
   },
   {
     type: 'separator',
@@ -117,8 +117,8 @@ if (process.platform === 'darwin') {
           click() {
             ipcRenderer.send('app.showSettings');
           },
-        }
-      ]
+        },
+      ],
     },
     {
       type: 'separator',
@@ -160,19 +160,22 @@ const template = [
         label: 'Open...',
         accelerator: 'CmdOrCtrl+o',
         click() {
-          dialog.showOpenDialog({
-            properties: ['openFile'],
-            filters: [
-              {name: 'JSON Files', extensions: ['json']},
-              {name: 'YAML Files', extensions: ['yaml', 'yml']},
-            ],
-          }, (filePaths) => {
-            if (filePaths) {
-              if (Electron.events.onOpenFile) {
-                Electron.events.onOpenFile(null, filePaths[0]);
+          dialog.showOpenDialog(
+            {
+              properties: ['openFile'],
+              filters: [
+                { name: 'JSON Files', extensions: ['json'] },
+                { name: 'YAML Files', extensions: ['yaml', 'yml'] },
+              ],
+            },
+            filePaths => {
+              if (filePaths) {
+                if (Electron.events.onOpenFile) {
+                  Electron.events.onOpenFile(null, filePaths[0]);
+                }
               }
             }
-          });
+          );
         },
       },
     ],
