@@ -7,7 +7,7 @@ const windowStateKeeper = require('electron-window-state');
 const api = require('../api');
 const config = require('../config');
 
-const {BrowserWindow, shell} = electron;
+const {BrowserWindow, shell, dialog} = electron;
 
 let mainWindow;
 
@@ -110,4 +110,22 @@ exports.createWindow = ({targetWindow, host, showSettings}) => {
         break;
     }
   });
-}
+
+  // Add prompt before quiting an app if onbeforeunload event is fired.
+  // This event is supported by electron 1.7.3 and above
+  // https://github.com/electron/electron/issues/2579
+  mainWindow.webContents.on('will-prevent-unload', (event) => {
+    const choice = dialog.showMessageBox(mainWindow, {
+      type: 'question',
+      buttons: ['Quit', 'Stay'],
+      title: 'Are you sure?',
+      message: 'You have unsaved changes. Do you want to quit?',
+      defaultId: 0,
+      cancelId: 1
+    });
+
+    if (choice === 0) {
+      event.preventDefault()
+    }
+  });
+};
