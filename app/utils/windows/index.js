@@ -11,9 +11,10 @@ const { BrowserWindow, shell, dialog } = electron;
 
 let mainWindow;
 
-exports.internalUrl = process.env.NODE_ENV === 'development'
-  ? process.env.ELECTRON_START_URL
-  : `file://${Path.resolve(Path.join(__dirname, '..', '..', 'build', 'index.html'))}`;
+exports.internalUrl =
+  process.env.NODE_ENV === 'development'
+    ? process.env.ELECTRON_START_URL
+    : `file://${Path.resolve(Path.join(__dirname, '..', '..', 'build', 'index.html'))}`;
 
 exports.getMainWindow = () => {
   return mainWindow;
@@ -37,7 +38,7 @@ exports.createWindow = ({ targetWindow, host, showSettings }) => {
       width: mainWindowState.width,
       height: mainWindowState.height,
       center: true,
-      titleBarStyle: 'hidden',
+      // titleBarStyle: 'hidden',
       backgroundColor: '#3B99FC',
       webPreferences: {
         webSecurity: false,
