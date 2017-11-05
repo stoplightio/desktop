@@ -4,3 +4,4 @@ node_modules
 /dist
 .idea
 /yarn-error.log
+/lerna-debug.log
