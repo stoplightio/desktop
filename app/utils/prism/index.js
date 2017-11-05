@@ -2,12 +2,12 @@ var server = null,
   starting = false,
   killing = false,
   onClose = null,
-  debug = process.env.NODE_ENV === 'development' ? true : false;
+  debug = process.env.NODE_ENV === "development" ? true : false;
 
-var fs = require('fs');
-var Path = require('path');
-var spawn = require('child_process').spawn;
-var psTree = require('ps-tree');
+var fs = require("fs");
+var Path = require("path");
+var spawn = require("child_process").spawn;
+var psTree = require("ps-tree");
 
 var logger = null;
 var log = function() {
@@ -16,7 +16,7 @@ var log = function() {
     // i is always valid index in the arguments object
     args[i] = arguments[i];
   }
-  args = ['%cprism', 'color: blue'].concat([].slice.call(args));
+  args = ["%cprism", "color: blue"].concat([].slice.call(args));
 
   if (logger) {
     logger.apply(null, args);
@@ -36,26 +36,26 @@ var kill = function(pid, signal, cb) {
     return;
   }
 
-  log('starting kill', pid, signal, server);
+  log("starting kill", pid, signal, server);
 
-  server.on('close', function(code) {
+  server.on("close", function(code) {
     resetProxy();
     if (cb) {
       cb();
     }
   });
 
-  signal = signal || 'SIGKILL';
-  if (process.platform === 'win32') {
+  signal = signal || "SIGKILL";
+  if (process.platform === "win32") {
     try {
       process.kill(pid, signal);
     } catch (ex) {
-      log('process.kill err', pid, signal, ex);
+      log("process.kill err", pid, signal, ex);
     }
   } else {
     psTree(pid, function(err, children) {
       if (err) {
-        log('kill psTree err', err);
+        log("kill psTree err", err);
         return;
       }
 
@@ -69,7 +69,7 @@ var kill = function(pid, signal, cb) {
           try {
             process.kill(tpid, signal);
           } catch (ex) {
-            log('process.kill err', tpid, signal, ex);
+            log("process.kill err", tpid, signal, ex);
           }
         });
     });
@@ -88,41 +88,56 @@ function startServer(options, cb) {
   var runDebugProxy = false;
   if (debug) {
     try {
-      fs.lstatSync(process.env.GOPATH + '/src/github.com/stoplightio/bear2.0/cmd/prism');
+      fs.lstatSync(
+        process.env.GOPATH + "/src/github.com/stoplightio/bear2.0/cmd/prism"
+      );
       runDebugProxy = true;
     } catch (e) {
-      log('cant start in debug mode', e);
+      log("cant start in debug mode", e);
     }
   }
 
   if (runDebugProxy) {
     //run -c config.json -s spec/orig/swagger.json -p 4011 -m -d
     // args = ['-a=run ' + ['-c ' + Path.join(options.config, 'config.json'), '-s ' + Path.join(options.config, 'spec.json')].join(' ')]
-    args = ['run', 'main.go', 'conduct', 'serve', `-p=${process.env.PRISM_PORT}`];
-    command = 'go';
-    commandDir = process.env.GOPATH + '/src/github.com/stoplightio/bear2.0/cmd/prism';
+    args = [
+      "run",
+      "main.go",
+      "conduct",
+      "serve",
+      `-p=${process.env.PRISM_PORT}`
+    ];
+    command = "go";
+    commandDir =
+      process.env.GOPATH + "/src/github.com/stoplightio/bear2.0/cmd/prism";
   } else {
-    if (process.platform === 'win32') {
-      command = 'prism.exe';
+    if (process.platform === "win32") {
+      command = "prism.exe";
     } else {
-      command = './prism';
+      command = "./prism";
     }
 
-    commandDir = Path.join(__dirname, '..', '..', 'proxy');
+    commandDir = Path.join(__dirname, "..", "..", "proxy");
     // args = ['run', '-c=./config.json', '-s=./spec.json']
-    args = ['conduct', 'serve', `-p=${process.env.PRISM_PORT}`];
+    args = ["conduct", "serve", `-p=${process.env.PRISM_PORT}`];
   }
 
-  log('starting proxy with command', commandDir, command, args, process.env.SL_API_HOST);
+  log(
+    "starting proxy with command",
+    commandDir,
+    command,
+    args,
+    process.env.SL_API_HOST
+  );
   server = spawn(command, args, {
-    cwd: commandDir,
+    cwd: commandDir
   });
 
-  server.stdout.on('data', function(data) {
+  server.stdout.on("data", function(data) {
     starting = false;
     log(String(data));
   });
-  server.stderr.on('data', function(data) {
+  server.stderr.on("data", function(data) {
     starting = false;
     var toLog = String(data);
     log(toLog);
@@ -133,12 +148,12 @@ function startServer(options, cb) {
       }
     }
   });
-  server.on('close', function(code) {
+  server.on("close", function(code) {
     if (onClose) {
       onClose(code);
     }
 
-    log('killed with code', code);
+    log("killed with code", code);
     resetProxy();
   });
 
@@ -148,21 +163,21 @@ function startServer(options, cb) {
   return server;
 }
 
-process.on('SIGTERM', function() {
+process.on("SIGTERM", function() {
   if (server) {
-    kill(server.pid, 'SIGTERM');
+    kill(server.pid, "SIGTERM");
   }
 });
 
-process.on('SIGINT', function() {
+process.on("SIGINT", function() {
   if (server) {
-    kill(server.pid, 'SIGINT');
+    kill(server.pid, "SIGINT");
   }
 });
 
-process.on('exit', function() {
+process.on("exit", function() {
   if (server) {
-    kill(server.pid, 'exit');
+    kill(server.pid, "exit");
   }
 });
 
@@ -172,12 +187,12 @@ serverFunctions.start = function(options, cb, onCloseCb) {
   onClose = onCloseCb;
 
   if (!server || server.exitCode) {
-    log('initializing start');
+    log("initializing start");
     return startServer(options, cb);
   }
 
   if (!starting && server.pid) {
-    log('initializing restart', server);
+    log("initializing restart", server);
     serverFunctions.stop(function() {
       startServer(options, cb);
     });
@@ -186,7 +201,7 @@ serverFunctions.start = function(options, cb, onCloseCb) {
 
 serverFunctions.stop = function(cb) {
   if (server) {
-    log('initializing stop');
+    log("initializing stop");
     kill(server.pid, null, cb);
   } else {
     log("tried to stop, but it's not running!");
