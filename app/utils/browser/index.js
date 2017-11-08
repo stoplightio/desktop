@@ -153,33 +153,34 @@ const template = [
     label: app.getName(),
     submenu: mainSubmenu
   },
-  {
-    label: "File",
-    submenu: [
-      {
-        label: "Open...",
-        accelerator: "CmdOrCtrl+o",
-        click() {
-          dialog.showOpenDialog(
-            {
-              properties: ["openFile"],
-              filters: [
-                { name: "JSON Files", extensions: ["json"] },
-                { name: "YAML Files", extensions: ["yaml", "yml"] }
-              ]
-            },
-            filePaths => {
-              if (filePaths) {
-                if (Electron.events.onOpenFile) {
-                  Electron.events.onOpenFile(null, filePaths[0]);
-                }
-              }
-            }
-          );
-        }
-      }
-    ]
-  },
+  // TODO once we support local git repos
+  // {
+  //   label: "File",
+  //   submenu: [
+  //     {
+  //       label: "Open...",
+  //       accelerator: "CmdOrCtrl+o",
+  //       click() {
+  //         dialog.showOpenDialog(
+  //           {
+  //             properties: ["openFile"],
+  //             filters: [
+  //               { name: "JSON Files", extensions: ["json"] },
+  //               { name: "YAML Files", extensions: ["yaml", "yml"] }
+  //             ]
+  //           },
+  //           filePaths => {
+  //             if (filePaths) {
+  //               if (Electron.events.onOpenFile) {
+  //                 Electron.events.onOpenFile(null, filePaths[0]);
+  //               }
+  //             }
+  //           }
+  //         );
+  //       }
+  //     }
+  //   ]
+  // },
   {
     label: "Edit",
     submenu: [
