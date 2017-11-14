@@ -15,7 +15,7 @@ class Host extends React.Component {
     };
   }
 
-  handleAddHost() {
+  handleAddHost = () => {
     const { hosts = [] } = this.state;
 
     const name = `new-host-${new Date().getTime()}`;
@@ -39,9 +39,9 @@ class Host extends React.Component {
       activeHost,
       hosts
     });
-  }
+  };
 
-  handleRemoveHost(i) {
+  handleRemoveHost = i => {
     const { hosts = [] } = this.state;
 
     _.pullAt(hosts, i);
@@ -52,9 +52,9 @@ class Host extends React.Component {
       activeHost: 0,
       hosts
     });
-  }
+  };
 
-  handleUpdateHost(i, t, p, v) {
+  handleUpdateHost = (i, t, p, v) => {
     const { hosts = [] } = this.state;
     const host = hosts[i] || {};
 
@@ -63,13 +63,13 @@ class Host extends React.Component {
 
     config.set("hosts", hosts);
     this.setState({ hosts });
-  }
+  };
 
-  handleLaunch() {
+  handleLaunch = () => {
     config.set("activeHost", this.state.activeHost);
     config.set("hosts", this.state.hosts);
     window.Electron.ipc.send("app.relaunch");
-  }
+  };
 
   render() {
     const { activeHost = 0, hosts = [] } = this.state;
