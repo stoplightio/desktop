@@ -2,7 +2,7 @@
   "name": "stoplight-next",
   "productName": "Stoplight Next",
   "description": "The kickass API platform.",
-  "version": "3.5.2",
+  "version": "3.5.3",
   "environment": "production",
   "homepage": "./",
   "license": "Apache-2.0",
