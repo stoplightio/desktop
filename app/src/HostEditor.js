@@ -35,7 +35,7 @@ class HostEditor extends React.Component {
               <Form.Field
                 label="*App Host"
                 name="appHost"
-                placeholder="https://scenarios.stoplight.io"
+                placeholder="https://next.stoplight.io"
                 value={host.appHost || ""}
                 control="input"
                 readOnly={disabled}
@@ -53,7 +53,7 @@ class HostEditor extends React.Component {
               <Form.Field
                 label="*API Host"
                 name="apiHost"
-                placeholder="https://api-next.stoplight.io"
+                placeholder="https://next.stoplight.io"
                 value={host.apiHost || ""}
                 control="input"
                 readOnly={disabled}

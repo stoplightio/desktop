@@ -14,7 +14,7 @@ class App extends React.Component {
     };
   }
 
-  handleTabClick(e, tab) {
+  handleTabClick = (e, tab) => {
     this.setState({ activeTab: tab.name });
   }
 
