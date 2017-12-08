@@ -3,6 +3,8 @@ const os = require("os");
 const fs = require("fs-extra");
 const electron = require("electron");
 const fileWatcher = require("chokidar");
+const OAuth2 = require('simple-oauth2');
+const shortid = require('shortid');
 
 const { ipcRenderer, remote, clipboard } = electron;
 const { app, Menu, shell, dialog } = remote;
@@ -10,6 +12,20 @@ const dataPath = app.getPath("appData");
 
 const config = remote.require("./utils/config");
 const api = remote.require("./utils/api");
+
+const createOAuth2 = ({ client_id, client_secret, access_token_url, authorize_url }) =>
+  OAuth2.create({
+    client: {
+      id: client_id,
+      secret: client_secret,
+    },
+    auth: {
+      tokenHost: access_token_url,
+      tokenPath: ' ',
+      authorizeHost: authorize_url,
+      authorizePath: ' ',
+    },
+  });
 
 // The values available to our dashboard
 global.Electron = {
@@ -33,6 +49,28 @@ global.Electron = {
     onOpenFile: null, // app must implement this to hook into file open events
     onOpenUrl: null, // app must implement this to hook into url open events
     onOpenAbout: null // app must implement this to hook into open about
+  },
+  oauth: {
+    //credentials: { scope, client_id, client_secret, access_token_url, authorize_url }
+    getAuthorizeURL: credentials => {
+      const oauth2instance = createOAuth2(credentials);
+
+      return oauth2instance.authorizationCode.authorizeURL({
+        scope: credentials.scope,
+        state: shortid.generate(),
+      });
+    },
+
+    /**
+     *
+     * @param credentials - { code, scope, client_id, client_secret, access_token_url, authorize_url }
+     * @return {Promise}
+     */
+    getAccessToken: credentials => {
+      const oauth2instance = createOAuth2(credentials);
+
+      return oauth2instance.authorizationCode.getToken({ code: credentials.code });
+    },
   }
 };
 

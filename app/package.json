@@ -26,7 +26,9 @@
     "react": "15.6.x",
     "react-dom": "15.6.x",
     "request": "2.81.x",
-    "semantic-ui-react": "0.71.x"
+    "semantic-ui-react": "0.71.x",
+    "shortid": "2.2.x",
+    "simple-oauth2": "1.5.x"
   },
   "devDependencies": {
     "react-scripts": "1.0.x"

@@ -311,10 +311,20 @@ ipcMain.on("updater.install", event => {
 
 // OAUTH
 
-ipcMain.on("open.oauth.window", (event, provider, url) => {
-  let authWindow = new BrowserWindow({
-    width: 1020,
-    height: 666,
+function getPopupSize(provider) {
+  switch (provider) {
+    case 'github':
+      return { width: 1020, height: 644 };
+    default:
+      return { width: 1020, height: 644 };
+  }
+}
+
+ipcMain.on('open.oauth.window', (event, { provider, url, param }) => {
+  const winSize = getPopupSize(provider);
+  const authWindow = new BrowserWindow({
+    width: winSize.width,
+    height: winSize.height,
     center: true,
     show: false,
     minimizable: false,
@@ -325,22 +335,21 @@ ipcMain.on("open.oauth.window", (event, provider, url) => {
       devTools: false,
       nodeIntegration: false
     },
-    session: session.fromPartition("persist:main", { cache: false })
+    session: session.fromPartition('persist:main', { cache: false })
   });
 
   authWindow.loadURL(url);
   authWindow.show();
 
-  authWindow.webContents.on("did-get-redirect-request", (e, oldUrl, newUrl) => {
-    if (newUrl.indexOf("access_token") !== -1) {
-      event.sender.send("oauth.token.ready", newUrl);
+  authWindow.webContents.on('did-get-redirect-request', (e, oldUrl, newUrl) => {
+    if (newUrl.indexOf(param) !== -1) {
+      event.sender.send(`oauth.${param}.ready`, newUrl);
       authWindow.close();
     }
   });
 
-  authWindow.on("closed", () => {
-    event.sender.send("oauth.token.ready");
-    authWindow = null;
+  authWindow.on('closed', () => {
+    event.sender.send('close.oauth.window');
   });
 });
 
