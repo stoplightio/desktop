@@ -348,6 +348,13 @@ ipcMain.on('open.oauth.window', (event, { provider, url, param }) => {
     }
   });
 
+  authWindow.webContents.on('will-navigate', (e, url) => {
+    if (url.indexOf(param) !== -1) {
+      event.sender.send(`oauth.${param}.ready`, url);
+      authWindow.close();
+    }
+  });
+
   authWindow.on('closed', () => {
     event.sender.send('close.oauth.window');
   });
