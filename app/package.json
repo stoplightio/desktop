@@ -15,7 +15,7 @@
     "body-parser": "1.x.x",
     "chokidar": "1.7.x",
     "electron-config": "1.0.x",
-    "electron-updater": "2.17.x",
+    "electron-updater": "2.16.x",
     "electron-window-state": "4.1.x",
     "express": "4.x.x",
     "fs-extra": "5.0.x",
