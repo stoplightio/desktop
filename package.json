@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "adm-zip": "0.4.x",
-    "electron": "1.7.9",
+    "electron": "1.7.10",
     "electron-builder": "19.45.0",
     "foreman": "2.0.x",
     "fs-extra": "3.x.x",
