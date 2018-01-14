@@ -1183,13 +1183,13 @@ buffer@^4.3.0:
     ieee754 "^1.1.4"
     isarray "^1.0.0"
 
-builder-util-runtime@~3.3.0:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/builder-util-runtime/-/builder-util-runtime-3.3.1.tgz#d905cd5b7be7e60124a532ddd0e988e12c1bd5c3"
+builder-util-runtime@~4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/builder-util-runtime/-/builder-util-runtime-4.0.1.tgz#d8423190a21e8c7cec185d589cb0cb888cc8e731"
   dependencies:
     bluebird-lst "^1.0.5"
     debug "^3.1.0"
-    fs-extra-p "^4.4.5"
+    fs-extra-p "^4.5.0"
     sax "^1.2.4"
 
 builtin-modules@^1.0.0, builtin-modules@^1.1.1:
@@ -2059,16 +2059,16 @@ electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.30:
   dependencies:
     electron-releases "^2.1.0"
 
-electron-updater@2.16.x:
-  version "2.16.3"
-  resolved "https://registry.yarnpkg.com/electron-updater/-/electron-updater-2.16.3.tgz#a5b3d7793398d1e4d5faf3b348041c540c4df977"
+electron-updater@2.18.2:
+  version "2.18.2"
+  resolved "https://registry.yarnpkg.com/electron-updater/-/electron-updater-2.18.2.tgz#776b50389b849535425e9e2893d7943ee61e8e3f"
   dependencies:
     bluebird-lst "^1.0.5"
-    builder-util-runtime "~3.3.0"
+    builder-util-runtime "~4.0.0"
     electron-is-dev "^0.3.0"
-    fs-extra-p "^4.4.4"
+    fs-extra-p "^4.5.0"
     js-yaml "^3.10.0"
-    lazy-val "^1.0.2"
+    lazy-val "^1.0.3"
     lodash.isequal "^4.5.0"
     semver "^5.4.1"
     source-map-support "^0.5.0"
@@ -2752,7 +2752,7 @@ from@~0:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/from/-/from-0.1.7.tgz#83c60afc58b9c56997007ed1a768b3ab303a44fe"
 
-fs-extra-p@^4.4.4, fs-extra-p@^4.4.5:
+fs-extra-p@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/fs-extra-p/-/fs-extra-p-4.5.0.tgz#b79f3f3fcc0b5e57b7e7caeb06159f958ef15fe8"
   dependencies:
@@ -4003,7 +4003,7 @@ lazy-req@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/lazy-req/-/lazy-req-1.1.0.tgz#bdaebead30f8d824039ce0ce149d4daa07ba1fac"
 
-lazy-val@^1.0.2:
+lazy-val@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/lazy-val/-/lazy-val-1.0.3.tgz#bb97b200ef00801d94c317e29dc6ed39e31c5edc"
 

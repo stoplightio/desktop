@@ -11,19 +11,15 @@
     "build": " npm run build:app && build --mac --linux --win --x64 --ia32",
     "build:app": "cd app && npm run build",
     "release": "build --mac --linux --win --x64 --ia32",
-    "build:production":
-      "NODE_ENV=production npm run pre:build && npm run build && npm run post:build",
-    "build:staging":
-      "NODE_ENV=staging npm run pre:build && npm run build && npm run post:build",
-    "release:production":
-      "NODE_ENV=production npm run pre:build && npm run release && npm run post:build",
-    "release:staging":
-      "NODE_ENV=staging npm run pre:build && npm run release && npm run post:build"
+    "build:production": "NODE_ENV=production npm run pre:build && npm run build && npm run post:build",
+    "build:staging": "NODE_ENV=staging npm run pre:build && npm run build && npm run post:build",
+    "release:production": "NODE_ENV=production npm run pre:build && npm run release && npm run post:build",
+    "release:staging": "NODE_ENV=staging npm run pre:build && npm run release && npm run post:build"
   },
   "devDependencies": {
     "adm-zip": "0.4.x",
     "electron": "1.7.10",
-    "electron-builder": "19.45.0",
+    "electron-builder": "19.52.1",
     "foreman": "2.0.x",
     "fs-extra": "3.x.x",
     "request": "2.x.x"
@@ -32,12 +28,10 @@
     "appId": "com.stoplight.app",
     "mac": {
       "extendInfo": {
-        "CFBundleURLTypes": [
-          {
-            "CFBundleURLSchemes": ["stoplight"],
-            "CFBundleURLName": "Stoplight Protocol"
-          }
-        ]
+        "CFBundleURLTypes": [{
+          "CFBundleURLSchemes": ["stoplight"],
+          "CFBundleURLName": "Stoplight Protocol"
+        }]
       },
       "category": "public.app-category.developer-tools",
       "target": ["dmg", "zip"]
@@ -51,12 +45,10 @@
     },
     "compression": "normal",
     "asar": false,
-    "extraResources": [
-      {
-        "from": "build-tmp/${os}/${arch}",
-        "to": "app"
-      }
-    ],
+    "extraResources": [{
+      "from": "build-tmp/${os}/${arch}",
+      "to": "app"
+    }],
     "publish": {
       "provider": "github"
     }
