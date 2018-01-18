@@ -1,18 +1,12 @@
-import React from "react";
-import { Form, Button, Popup } from "semantic-ui-react";
-import _ from "lodash";
+import React from 'react';
+import { Form, Button, Popup } from 'semantic-ui-react';
+import _ from 'lodash';
 
-import "./HostEditor.css";
+import './HostEditor.css';
 
 class HostEditor extends React.Component {
   render() {
-    const {
-      disabled,
-      host,
-      handleRemove,
-      handleLaunch,
-      handleUpdate
-    } = this.props;
+    const { disabled, host, handleRemove, handleLaunch, handleUpdate } = this.props;
 
     return (
       <div className="HostEditor">
@@ -21,10 +15,10 @@ class HostEditor extends React.Component {
             label="*Name"
             name="name"
             placeholder="host-name"
-            value={host.name || ""}
+            value={host.name || ''}
             control="input"
             readOnly={disabled}
-            onChange={e => handleUpdate("set", "name", e.target.value)}
+            onChange={e => handleUpdate('set', 'name', e.target.value)}
           />
 
           <Popup
@@ -36,10 +30,10 @@ class HostEditor extends React.Component {
                 label="*App Host"
                 name="appHost"
                 placeholder="https://next.stoplight.io"
-                value={host.appHost || ""}
+                value={host.appHost || ''}
                 control="input"
                 readOnly={disabled}
-                onChange={e => handleUpdate("set", "appHost", e.target.value)}
+                onChange={e => handleUpdate('set', 'appHost', e.target.value)}
               />
             }
             content="The URL to the Stoplight server instance you would like to connect to."
@@ -54,10 +48,10 @@ class HostEditor extends React.Component {
                 label="*API Host"
                 name="apiHost"
                 placeholder="https://next.stoplight.io"
-                value={host.apiHost || ""}
+                value={host.apiHost || ''}
                 control="input"
                 readOnly={disabled}
-                onChange={e => handleUpdate("set", "apiHost", e.target.value)}
+                onChange={e => handleUpdate('set', 'apiHost', e.target.value)}
               />
             }
             content="The URL to the Stoplight API instance you would like to connect to."
@@ -76,11 +70,11 @@ class HostEditor extends React.Component {
                   window.Electron.env.https_proxy ||
                   window.Electron.env.HTTP_PROXY ||
                   window.Electron.env.http_proxy ||
-                  "optional, i.e. `http://127.0.0.1:2819`"
+                  'optional, i.e. `http://127.0.0.1:2819`'
                 }
-                value={_.get(host, ["proxy", "url"], "")}
+                value={_.get(host, ['proxy', 'url'], '')}
                 control="input"
-                onChange={e => handleUpdate("set", "proxy.url", e.target.value)}
+                onChange={e => handleUpdate('set', 'proxy.url', e.target.value)}
                 size="tiny"
               />
             }
@@ -98,12 +92,11 @@ class HostEditor extends React.Component {
                 placeholder={
                   window.Electron.env.NO_PROXY ||
                   window.Electron.env.no_proxy ||
-                  "optional, i.e. `<local>,*.example.com`"
+                  'optional, i.e. `<local>,*.example.com`'
                 }
-                value={_.get(host, ["proxy", "bypass"], "")}
+                value={_.get(host, ['proxy', 'bypass'], '')}
                 control="input"
-                onChange={e =>
-                  handleUpdate("set", "proxy.bypass", e.target.value)}
+                onChange={e => handleUpdate('set', 'proxy.bypass', e.target.value)}
                 size="tiny"
               />
             }
@@ -123,12 +116,11 @@ class HostEditor extends React.Component {
                   window.Electron.env.https_proxy_user ||
                   window.Electron.env.HTTP_PROXY_USER ||
                   window.Electron.env.http_proxy_user ||
-                  ""
+                  ''
                 }
-                value={_.get(host, ["proxy", "user"], "")}
+                value={_.get(host, ['proxy', 'user'], '')}
                 control="input"
-                onChange={e =>
-                  handleUpdate("set", "proxy.user", e.target.value)}
+                onChange={e => handleUpdate('set', 'proxy.user', e.target.value)}
                 size="tiny"
               />
             }
@@ -149,12 +141,11 @@ class HostEditor extends React.Component {
                   window.Electron.env.https_proxy_pass ||
                   window.Electron.env.HTTP_PROXY_PASS ||
                   window.Electron.env.http_proxy_password ||
-                  ""
+                  ''
                 }
-                value={_.get(host, ["proxy", "pass"], "")}
+                value={_.get(host, ['proxy', 'pass'], '')}
                 control="input"
-                onChange={e =>
-                  handleUpdate("set", "proxy.pass", e.target.value)}
+                onChange={e => handleUpdate('set', 'proxy.pass', e.target.value)}
                 size="tiny"
               />
             }
@@ -162,11 +153,7 @@ class HostEditor extends React.Component {
           />
 
           <div className="pt-1">
-            <Button
-              primary
-              content="Relaunch With This Host"
-              onClick={handleLaunch}
-            />
+            <Button primary content="Relaunch With This Host" onClick={handleLaunch} />
 
             <Button
               icon="remove"

@@ -1,3 +1,3 @@
-const fs = require("fs-extra");
+const fs = require('fs-extra');
 
-fs.removeSync("build-tmp");
+fs.removeSync('build-tmp');
