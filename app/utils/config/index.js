@@ -10,6 +10,7 @@ exports.data = new Config({
         name: 'stoplight',
         appHost: process.env.SL_HOST,
         apiHost: process.env.SL_API_HOST,
+        prismPort: process.env.PRISM_PORT,
         proxy: {
           url: '',
           bypass: '',

@@ -23,6 +23,7 @@ class Host extends React.Component {
       name,
       appHost: '',
       apiHost: '',
+      prismPort: '',
       proxy: {
         url: '',
         bypass: '',

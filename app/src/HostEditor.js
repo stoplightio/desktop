@@ -47,7 +47,7 @@ class HostEditor extends React.Component {
               <Form.Field
                 label="*API Host"
                 name="apiHost"
-                placeholder="https://next.stoplight.io"
+                placeholder="https://next-api.stoplight.io"
                 value={host.apiHost || ''}
                 control="input"
                 readOnly={disabled}
@@ -55,6 +55,24 @@ class HostEditor extends React.Component {
               />
             }
             content="The URL to the Stoplight API instance you would like to connect to."
+          />
+
+          <Popup
+            position="bottom right"
+            size="tiny"
+            wide
+            trigger={
+              <Form.Field
+                label="Prism Port"
+                name="prismPort"
+                placeholder="4020"
+                value={host.prismPort || ''}
+                control="input"
+                readOnly={disabled}
+                onChange={e => handleUpdate('set', 'prismPort', e.target.value)}
+              />
+            }
+            content="The port that the local instance of Prism should start on."
           />
 
           <Popup
@@ -154,7 +172,6 @@ class HostEditor extends React.Component {
 
           <div className="pt-1">
             <Button primary content="Relaunch With This Host" onClick={handleLaunch} />
-
             <Button
               icon="remove"
               content="Remove"

@@ -14,23 +14,32 @@ const { app, ipcMain, BrowserWindow, dialog, shell, session } = electron;
 
 // Set base process vars
 process.env.NODE_ENV = process.env.NODE_ENV || pjson.environment || 'development';
+
+let SL_HOST;
+let SL_API_HOST;
+let PRISM_PORT;
+
 switch (process.env.NODE_ENV) {
   case 'production':
-    process.env.SL_HOST = 'https://next.stoplight.io';
-    process.env.SL_API_HOST = 'https://next-api.stoplight.io';
-    process.env.PRISM_PORT = 4020;
+    SL_HOST = 'https://next.stoplight.io';
+    SL_API_HOST = 'https://next-api.stoplight.io';
+    PRISM_PORT = 4020;
     break;
   case 'staging':
-    process.env.SL_HOST = 'https://staging.stoplight.io';
-    process.env.SL_API_HOST = 'https://api.staging.stoplight.io';
-    process.env.PRISM_PORT = 4015;
+    SL_HOST = 'https://staging.stoplight.io';
+    SL_API_HOST = 'https://api.staging.stoplight.io';
+    PRISM_PORT = 4015;
     break;
   default:
-    process.env.SL_HOST = 'http://localhost:3100';
-    process.env.SL_API_HOST = 'http://localhost:3030';
-    process.env.PRISM_PORT = 4025;
+    SL_HOST = 'http://localhost:3100';
+    SL_API_HOST = 'http://localhost:3030';
+    PRISM_PORT = 4025;
     break;
 }
+
+process.env.SL_HOST = process.env.SL_HOST || SL_HOST;
+process.env.SL_API_HOST = process.env.SL_API_HOST || SL_API_HOST;
+process.env.PRISM_PORT = process.env.PRISM_PORT || PRISM_PORT;
 
 // API
 
@@ -119,7 +128,10 @@ const config = require('./utils/config');
 let host;
 try {
   host = config.currentHost();
-  hosts.initHost({ app, host });
+  hosts.initHost({
+    app,
+    host,
+  });
 } catch (e) {
   config.data.set('hostError', String(e));
 }
@@ -127,7 +139,9 @@ try {
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.
 app.on('ready', () => {
-  windows.createWindow({ host });
+  windows.createWindow({
+    host,
+  });
 });
 
 ipcMain.on('app.relaunch', () => {
@@ -150,7 +164,9 @@ ipcMain.on('app.showSettings', () => {
 ipcMain.on('proxy.start', (event, options, env) => {
   try {
     PrismServer.start(
-      options,
+      _.merge({}, options, {
+        host,
+      }),
       () => {
         event.sender.send('proxy.start.resolve');
       },
@@ -295,9 +311,15 @@ ipcMain.on('updater.install', event => {
 function getPopupSize(provider) {
   switch (provider) {
     case 'github':
-      return { width: 1020, height: 644 };
+      return {
+        width: 1020,
+        height: 644,
+      };
     default:
-      return { width: 1020, height: 644 };
+      return {
+        width: 1020,
+        height: 644,
+      };
   }
 }
 
@@ -316,7 +338,9 @@ ipcMain.on('open.oauth.window', (event, { provider, url, param }) => {
       devTools: false,
       nodeIntegration: false,
     },
-    session: session.fromPartition('persist:main', { cache: false }),
+    session: session.fromPartition('persist:main', {
+      cache: false,
+    }),
   });
 
   authWindow.loadURL(url);

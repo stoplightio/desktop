@@ -4,6 +4,7 @@ var server = null,
   onClose = null,
   debug = process.env.NODE_ENV === 'development' ? true : false;
 
+const _ = require('lodash');
 var fs = require('fs');
 var Path = require('path');
 var spawn = require('child_process').spawn;
@@ -95,10 +96,12 @@ function startServer(options, cb) {
     }
   }
 
+  const prismPort = _.get(options, 'host.prismPort', process.env.PRISM_PORT);
+
   if (runDebugProxy) {
     //run -c config.json -s spec/orig/swagger.json -p 4011 -m -d
     // args = ['-a=run ' + ['-c ' + Path.join(options.config, 'config.json'), '-s ' + Path.join(options.config, 'spec.json')].join(' ')]
-    args = ['run', 'main.go', 'conduct', 'serve', `-p=${process.env.PRISM_PORT}`];
+    args = ['run', 'main.go', 'conduct', 'serve', `-p=${prismPort}`];
     command = 'go';
     commandDir = process.env.GOPATH + '/src/github.com/stoplightio/bear2.0/cmd/prism';
   } else {
@@ -110,7 +113,7 @@ function startServer(options, cb) {
 
     commandDir = Path.join(__dirname, '..', '..', 'proxy');
     // args = ['run', '-c=./config.json', '-s=./spec.json']
-    args = ['conduct', 'serve', `-p=${process.env.PRISM_PORT}`];
+    args = ['conduct', 'serve', `-p=${prismPort}`];
   }
 
   log('starting proxy with command', commandDir, command, args, process.env.SL_API_HOST);
