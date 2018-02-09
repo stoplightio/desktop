@@ -18,8 +18,8 @@
   },
   "devDependencies": {
     "adm-zip": "0.4.x",
-    "electron": "1.7.10",
-    "electron-builder": "19.52.1",
+    "electron": "1.8.2",
+    "electron-builder": "19.56.0",
     "foreman": "2.0.x",
     "fs-extra": "3.x.x",
     "request": "2.x.x"
