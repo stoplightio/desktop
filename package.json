@@ -14,7 +14,8 @@
     "build:production": "NODE_ENV=production npm run pre:build && npm run build && npm run post:build",
     "build:staging": "NODE_ENV=staging npm run pre:build && npm run build && npm run post:build",
     "release:production": "NODE_ENV=production npm run pre:build && npm run release && npm run post:build",
-    "release:staging": "NODE_ENV=staging npm run pre:build && npm run release && npm run post:build"
+    "release:staging": "NODE_ENV=staging npm run pre:build && npm run release && npm run post:build",
+    "format": "prettier --single-quote --trailing-comma es5 --print-width 100 --write \"**/*.js\""
   },
   "devDependencies": {
     "adm-zip": "0.4.x",
@@ -22,7 +23,8 @@
     "electron-builder": "19.56.0",
     "foreman": "2.0.x",
     "fs-extra": "3.x.x",
-    "request": "2.x.x"
+    "request": "2.x.x",
+    "prettier": "1.10.x"
   },
   "build": {
     "appId": "com.stoplight.app",

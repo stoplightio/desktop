@@ -1,29 +1,29 @@
-import React from "react";
-import { Header, Menu, Segment } from "semantic-ui-react";
+import React from 'react';
+import { Header, Menu, Segment } from 'semantic-ui-react';
 
-import Hosts from "./Hosts";
-import Help from "./Help";
+import Hosts from './Hosts';
+import Help from './Help';
 
-import "./App.css";
+import './App.css';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTab: "hosts"
+      activeTab: 'hosts',
     };
   }
 
   handleTabClick = (e, tab) => {
     this.setState({ activeTab: tab.name });
-  }
+  };
 
   render() {
-    const { activeTab = "hosts" } = this.state;
+    const { activeTab = 'hosts' } = this.state;
 
     let contentElem;
     switch (activeTab) {
-      case "hosts":
+      case 'hosts':
         contentElem = <Hosts />;
         break;
       default:
@@ -44,19 +44,11 @@ class App extends React.Component {
           <br />
 
           <Menu>
-            <Menu.Item
-              name="hosts"
-              active={activeTab === "hosts"}
-              onClick={this.handleTabClick}
-            >
+            <Menu.Item name="hosts" active={activeTab === 'hosts'} onClick={this.handleTabClick}>
               Hosts
             </Menu.Item>
 
-            <Menu.Item
-              name="help"
-              active={activeTab === "help"}
-              onClick={this.handleTabClick}
-            >
+            <Menu.Item name="help" active={activeTab === 'help'} onClick={this.handleTabClick}>
               Help
             </Menu.Item>
           </Menu>
