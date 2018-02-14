@@ -1,17 +1,17 @@
-const Path = require("path");
-const os = require("os");
-const fs = require("fs-extra");
-const electron = require("electron");
-const fileWatcher = require("chokidar");
+const Path = require('path');
+const os = require('os');
+const fs = require('fs-extra');
+const electron = require('electron');
+const fileWatcher = require('chokidar');
 const OAuth2 = require('simple-oauth2');
 const shortid = require('shortid');
 
 const { ipcRenderer, remote, clipboard } = electron;
 const { app, Menu, shell, dialog } = remote;
-const dataPath = app.getPath("appData");
+const dataPath = app.getPath('appData');
 
-const config = remote.require("./utils/config");
-const api = remote.require("./utils/api");
+const config = remote.require('./utils/config');
+const api = remote.require('./utils/api');
 
 const createOAuth2 = ({ client_id, client_secret, access_token_url, authorize_url }) =>
   OAuth2.create({
@@ -43,12 +43,12 @@ global.Electron = {
   ipc: ipcRenderer,
   path: Path,
   menu: Menu,
-  proxyPath: Path.join(__dirname, "proxy"),
+  proxyPath: Path.join(__dirname, 'proxy'),
   version: app.getVersion(),
   events: {
     onOpenFile: null, // app must implement this to hook into file open events
     onOpenUrl: null, // app must implement this to hook into url open events
-    onOpenAbout: null // app must implement this to hook into open about
+    onOpenAbout: null, // app must implement this to hook into open about
   },
   oauth: {
     //credentials: { scope, client_id, client_secret, access_token_url, authorize_url }
@@ -71,15 +71,15 @@ global.Electron = {
 
       return oauth2instance.authorizationCode.getToken({ code: credentials.code });
     },
-  }
+  },
 };
 
-app.on("open-file", (e, path) => {
+app.on('open-file', (e, path) => {
   if (Electron.events.onOpenFile) {
     Electron.events.onOpenFile(e, path);
   }
 });
-app.on("open-url", (e, url) => {
+app.on('open-url', (e, url) => {
   if (Electron.events.onOpenUrl) {
     Electron.events.onOpenUrl(e, url);
   }
@@ -89,107 +89,107 @@ app.on("open-url", (e, url) => {
 
 let mainSubmenu = [
   {
-    label: "Check for Updates",
+    label: 'Check for Updates',
     click: function() {
       if (Electron.events.onOpenAbout) {
         Electron.events.onOpenAbout();
       }
 
-      if (process.platform !== "linux") {
-        ipcRenderer.send("updater.check");
+      if (process.platform !== 'linux') {
+        ipcRenderer.send('updater.check');
       }
-    }
+    },
   },
   {
-    type: "separator"
+    type: 'separator',
   },
   {
-    label: "Preferences",
+    label: 'Preferences',
     submenu: [
       {
-        label: "Hosts Configuration",
+        label: 'Hosts Configuration',
         click() {
-          ipcRenderer.send("app.showSettings");
-        }
-      }
-    ]
+          ipcRenderer.send('app.showSettings');
+        },
+      },
+    ],
   },
   {
-    type: "separator"
+    type: 'separator',
   },
   {
-    role: "quit"
-  }
+    role: 'quit',
+  },
 ];
 
-if (process.platform === "darwin") {
+if (process.platform === 'darwin') {
   mainSubmenu = [
     {
-      label: "About Stoplight",
+      label: 'About Stoplight',
       click: function() {
         if (Electron.events.onOpenAbout) {
           Electron.events.onOpenAbout();
         }
-      }
+      },
     },
     {
-      label: "Check for Updates",
+      label: 'Check for Updates',
       click: function() {
         if (Electron.events.onOpenAbout) {
           Electron.events.onOpenAbout();
         }
 
-        if (process.platform !== "linux") {
-          ipcRenderer.send("updater.check");
+        if (process.platform !== 'linux') {
+          ipcRenderer.send('updater.check');
         }
-      }
+      },
     },
     {
-      type: "separator"
+      type: 'separator',
     },
     {
-      label: "Preferences",
+      label: 'Preferences',
       submenu: [
         {
-          label: "Hosts Configuration",
+          label: 'Hosts Configuration',
           click() {
-            ipcRenderer.send("app.showSettings");
-          }
-        }
-      ]
+            ipcRenderer.send('app.showSettings');
+          },
+        },
+      ],
     },
     {
-      type: "separator"
+      type: 'separator',
     },
     {
-      role: "services",
-      submenu: []
+      role: 'services',
+      submenu: [],
     },
     {
-      type: "separator"
+      type: 'separator',
     },
     {
-      role: "hide"
+      role: 'hide',
     },
     {
-      role: "hideothers"
+      role: 'hideothers',
     },
     {
-      role: "unhide"
+      role: 'unhide',
     },
     {
-      type: "separator"
+      type: 'separator',
     },
     {
-      role: "quit"
-    }
+      role: 'quit',
+    },
   ];
 }
 
 const template = [
   {
     label: app.getName(),
-    submenu: mainSubmenu
+    submenu: mainSubmenu,
   },
   // TODO once we support local git repos
   // {
@@ -220,60 +220,60 @@ const template = [
   //   ]
   // },
   {
-    label: "Edit",
+    label: 'Edit',
     submenu: [
       {
-        role: "undo"
+        role: 'undo',
       },
       {
-        role: "redo"
+        role: 'redo',
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        label: "Back",
-        accelerator: "CmdOrCtrl+[",
+        label: 'Back',
+        accelerator: 'CmdOrCtrl+[',
         click(item, focusedWindow) {
           const contents = focusedWindow ? focusedWindow.webContents : null;
           if (contents && contents.canGoBack()) {
             contents.goBack();
           }
-        }
+        },
       },
       {
-        label: "Forward",
-        accelerator: "CmdOrCtrl+]",
+        label: 'Forward',
+        accelerator: 'CmdOrCtrl+]',
         click(item, focusedWindow) {
           const contents = focusedWindow ? focusedWindow.webContents : null;
           if (contents && contents.canGoForward()) {
             contents.goForward();
           }
-        }
+        },
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        label: "Copy Current URL to Clipboard",
-        accelerator: "CmdOrCtrl+Shift+C",
+        label: 'Copy Current URL to Clipboard',
+        accelerator: 'CmdOrCtrl+Shift+C',
         click(item, focusedWindow) {
           const contents = focusedWindow ? focusedWindow.webContents : null;
           if (contents) {
             const url = contents.getURL();
             if (url) {
               clipboard.writeText(url);
-              new Notification("Copied!", {
-                title: "Copied!",
-                body: url
+              new Notification('Copied!', {
+                title: 'Copied!',
+                body: url,
               });
             }
           }
-        }
+        },
       },
       {
-        label: "Open Current URL in Browser",
-        accelerator: "CmdOrCtrl+Shift+O",
+        label: 'Open Current URL in Browser',
+        accelerator: 'CmdOrCtrl+Shift+O',
         click(item, focusedWindow) {
           const contents = focusedWindow ? focusedWindow.webContents : null;
           if (contents) {
@@ -282,126 +282,126 @@ const template = [
               shell.openExternal(url);
             }
           }
-        }
+        },
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        role: "cut"
+        role: 'cut',
       },
       {
-        role: "copy"
+        role: 'copy',
       },
       {
-        role: "paste"
+        role: 'paste',
       },
       {
-        role: "pasteandmatchstyle"
+        role: 'pasteandmatchstyle',
       },
       {
-        role: "delete"
+        role: 'delete',
       },
       {
-        role: "selectall"
-      }
-    ]
+        role: 'selectall',
+      },
+    ],
   },
   {
-    label: "View",
+    label: 'View',
     submenu: [
       {
-        role: "reload"
+        role: 'reload',
       },
       {
-        role: "toggledevtools"
+        role: 'toggledevtools',
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        role: "resetzoom"
+        role: 'resetzoom',
       },
       {
-        role: "zoomin"
+        role: 'zoomin',
       },
       {
-        role: "zoomout"
+        role: 'zoomout',
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        role: "togglefullscreen"
-      }
-    ]
+        role: 'togglefullscreen',
+      },
+    ],
   },
   {
-    role: "window",
+    role: 'window',
     submenu: [
       {
-        role: "minimize"
+        role: 'minimize',
       },
       {
-        role: "close"
-      }
-    ]
+        role: 'close',
+      },
+    ],
   },
   {
-    role: "help",
+    role: 'help',
     submenu: [
       {
-        label: "Learn More",
+        label: 'Learn More',
         click() {
-          shell.openExternal("https://help.stoplight.io");
-        }
-      }
-    ]
-  }
+          shell.openExternal('https://help.stoplight.io');
+        },
+      },
+    ],
+  },
 ];
 
-if (process.platform === "darwin") {
+if (process.platform === 'darwin') {
   // Edit menu.
   template[2].submenu.push(
     {
-      type: "separator"
+      type: 'separator',
     },
     {
-      label: "Speech",
+      label: 'Speech',
       submenu: [
         {
-          role: "startspeaking"
+          role: 'startspeaking',
         },
         {
-          role: "stopspeaking"
-        }
-      ]
+          role: 'stopspeaking',
+        },
+      ],
     }
   );
 
   // Window menu.
   template[4].submenu = [
     {
-      label: "Close",
-      accelerator: "CmdOrCtrl+W",
-      role: "close"
+      label: 'Close',
+      accelerator: 'CmdOrCtrl+W',
+      role: 'close',
     },
     {
-      label: "Minimize",
-      accelerator: "CmdOrCtrl+M",
-      role: "minimize"
+      label: 'Minimize',
+      accelerator: 'CmdOrCtrl+M',
+      role: 'minimize',
     },
     {
-      label: "Zoom",
-      role: "zoom"
+      label: 'Zoom',
+      role: 'zoom',
     },
     {
-      type: "separator"
+      type: 'separator',
     },
     {
-      label: "Bring All to Front",
-      role: "front"
-    }
+      label: 'Bring All to Front',
+      role: 'front',
+    },
   ];
 }
 
@@ -410,11 +410,11 @@ Menu.setApplicationMenu(menu);
 
 // DEV TOOLS LOGGING
 
-ipcRenderer.on("console.log", (...args) => {
+ipcRenderer.on('console.log', (...args) => {
   console.log.apply(console, args.slice(1));
 });
 
-ipcRenderer.on("console.error", (...args) => {
+ipcRenderer.on('console.error', (...args) => {
   console.error.apply(console, args.slice(1));
 });
 
@@ -422,7 +422,7 @@ ipcRenderer.on("console.error", (...args) => {
 
 // There's an issue w electron that they are fixing right now,
 // but it will work soon.
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === 'development') {
   // remote.require('browser-window').removeDevToolsExtension("New React Developer Tools")
   // remote.require('browser-window').addDevToolsExtension(require('path').join(__dirname, '..', 'extensions', 'react-devtools', 'shells', 'chrome'))
 }
