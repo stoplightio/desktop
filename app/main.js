@@ -142,9 +142,9 @@ app.on('ready', () => {
   );
 
   oauthUtils.init();
-  updaterUtils.init({ app, logger: browserLogger });
   sessionUtils.init({ app, logger: browserLogger }, () => {
     windowUtils.createWindow();
+    updaterUtils.init({ app, logger: browserLogger });
   });
 });
 
