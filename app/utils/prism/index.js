@@ -9,6 +9,8 @@ var Path = require("path");
 var spawn = require("child_process").spawn;
 var psTree = require("ps-tree");
 
+const configUtils = require("../config");
+
 var logger = null;
 var log = function() {
   var args = new Array(arguments.length);
@@ -105,7 +107,7 @@ function startServer(options, cb) {
       "main.go",
       "conduct",
       "serve",
-      `-p=${process.env.PRISM_PORT}`
+      `-p=${configUtils.get("prism.port")}`
     ];
     command = "go";
     commandDir =
@@ -119,7 +121,7 @@ function startServer(options, cb) {
 
     commandDir = Path.join(__dirname, "..", "..", "..", "app", "proxy");
     // args = ['run', '-c=./config.json', '-s=./spec.json']
-    args = ["conduct", "serve", `-p=${process.env.PRISM_PORT}`];
+    args = ["conduct", "serve", `-p=${configUtils.get("prism.port")}`];
   }
 
   log("starting prism with command", commandDir, command, args);

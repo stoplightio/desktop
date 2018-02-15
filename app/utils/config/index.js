@@ -37,7 +37,7 @@ exports.init = () => {
     },
 
     prism: {
-      port: process.env.PRISM_PORT
+      port: process.env.SL_PRISM_PORT
     }
   };
 
