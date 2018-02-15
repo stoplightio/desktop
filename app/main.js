@@ -118,6 +118,10 @@ app.on("ready", () => {
   protocol.registerFileProtocol(
     "stoplight",
     (request, callback) => {
+      if (!request || !request.url) {
+        return callback(Path.normalize(`${__dirname}/index.html`));
+      }
+
       /**
        * Take out the fake "host".
        *
@@ -155,8 +159,8 @@ app.on("ready", () => {
   );
 
   oauthUtils.init();
-  updaterUtils.init({ app });
-  sessionUtils.init({ logger: browserLogger }, () => {
+  updaterUtils.init({ app, logger: browserLogger });
+  sessionUtils.init({ app, logger: browserLogger }, () => {
     windowUtils.createWindow();
   });
 });

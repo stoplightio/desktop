@@ -67,7 +67,7 @@ exports.checkForUpdates = () => {
   autoUpdater.checkForUpdates();
 };
 
-exports.init = ({ app }) => {
+exports.init = ({ app, logger }) => {
   if (process.platform !== "linux") {
     exports.checkForUpdates();
 
@@ -88,16 +88,28 @@ exports.init = ({ app }) => {
   }
 
   ipcMain.on("updater.check", event => {
-    console.log("CHECK");
     manualUpdateCheck = true;
+
+    if (logger) {
+      logger("updater.check");
+    }
+
     exports.checkForUpdates();
   });
 
   ipcMain.on("updater.install", event => {
+    if (logger) {
+      logger("updater.install");
+    }
+
     autoUpdater.quitAndInstall();
   });
 
   ipcMain.on("updater.download", event => {
+    if (logger) {
+      logger("updater.download");
+    }
+
     autoUpdater.downloadUpdate();
   });
 };
