@@ -3,52 +3,75 @@ const os = require("os");
 const fs = require("fs-extra");
 const electron = require("electron");
 const fileWatcher = require("chokidar");
-const OAuth2 = require('simple-oauth2');
-const shortid = require('shortid');
+const OAuth2 = require("simple-oauth2");
+const shortid = require("shortid");
+const _ = require("lodash");
 
 const { ipcRenderer, remote, clipboard } = electron;
 const { app, Menu, shell, dialog } = remote;
 const dataPath = app.getPath("appData");
 
 const config = remote.require("./utils/config");
-const api = remote.require("./utils/api");
 
-const createOAuth2 = ({ client_id, client_secret, access_token_url, authorize_url }) =>
+const env = remote.process.env;
+if (env.NODE_ENV === "development") {
+  require("devtron").install();
+}
+
+const createOAuth2 = ({
+  client_id,
+  client_secret,
+  access_token_url,
+  authorize_url
+}) =>
   OAuth2.create({
     client: {
       id: client_id,
-      secret: client_secret,
+      secret: client_secret
     },
     auth: {
       tokenHost: access_token_url,
-      tokenPath: ' ',
+      tokenPath: " ",
       authorizeHost: authorize_url,
-      authorizePath: ' ',
-    },
+      authorizePath: " "
+    }
   });
 
 // The values available to our dashboard
 global.Electron = {
-  app,
-  dataPath,
-  remote,
-  os,
   fs,
-  clipboard,
   shell,
   dialog,
   fileWatcher,
-  env: process.env,
-  config: config.data,
   ipc: ipcRenderer,
-  path: Path,
-  menu: Menu,
-  proxyPath: Path.join(__dirname, "proxy"),
-  version: app.getVersion(),
+  config: {
+    get: config.get,
+    set: config.set
+  },
   events: {
     onOpenFile: null, // app must implement this to hook into file open events
     onOpenUrl: null, // app must implement this to hook into url open events
     onOpenAbout: null // app must implement this to hook into open about
+  },
+  env: {
+    name: env.NODE_ENV,
+    arch: os.arch(),
+    platform: os.platform(),
+    version: app.getVersion(),
+    dataPath,
+    http_proxy:
+      env.HTTPS_PROXY || env.https_proxy || env.HTTP_PROXY || env.http_proxy,
+    no_proxy: env.NO_PROXY || env.no_proxy,
+    http_proxy_user:
+      env.HTTPS_PROXY_USER ||
+      env.https_proxy_user ||
+      env.HTTP_PROXY_USER ||
+      env.http_proxy_user,
+    http_proxy_pass:
+      env.HTTPS_PROXY_PASS ||
+      env.https_proxy_pass ||
+      env.HTTP_PROXY_PASS ||
+      env.http_proxy_pass
   },
   oauth: {
     //credentials: { scope, client_id, client_secret, access_token_url, authorize_url }
@@ -57,7 +80,7 @@ global.Electron = {
 
       return oauth2instance.authorizationCode.authorizeURL({
         scope: credentials.scope,
-        state: shortid.generate(),
+        state: shortid.generate()
       });
     },
 
@@ -69,8 +92,10 @@ global.Electron = {
     getAccessToken: credentials => {
       const oauth2instance = createOAuth2(credentials);
 
-      return oauth2instance.authorizationCode.getToken({ code: credentials.code });
-    },
+      return oauth2instance.authorizationCode.getToken({
+        code: credentials.code
+      });
+    }
   }
 };
 
@@ -89,6 +114,14 @@ app.on("open-url", (e, url) => {
 
 let mainSubmenu = [
   {
+    label: "About Stoplight",
+    click: function() {
+      if (Electron.events.onOpenAbout) {
+        Electron.events.onOpenAbout();
+      }
+    }
+  },
+  {
     label: "Check for Updates",
     click: function() {
       if (Electron.events.onOpenAbout) {
@@ -105,62 +138,17 @@ let mainSubmenu = [
   },
   {
     label: "Preferences",
-    submenu: [
-      {
-        label: "Hosts Configuration",
-        click() {
-          ipcRenderer.send("app.showSettings");
-        }
-      }
-    ]
+    click() {
+      ipcRenderer.send("app.showSettings");
+    }
   },
   {
     type: "separator"
-  },
-  {
-    role: "quit"
   }
 ];
 
 if (process.platform === "darwin") {
-  mainSubmenu = [
-    {
-      label: "About Stoplight",
-      click: function() {
-        if (Electron.events.onOpenAbout) {
-          Electron.events.onOpenAbout();
-        }
-      }
-    },
-    {
-      label: "Check for Updates",
-      click: function() {
-        if (Electron.events.onOpenAbout) {
-          Electron.events.onOpenAbout();
-        }
-
-        if (process.platform !== "linux") {
-          ipcRenderer.send("updater.check");
-        }
-      }
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Preferences",
-      submenu: [
-        {
-          label: "Hosts Configuration",
-          click() {
-            ipcRenderer.send("app.showSettings");
-          }
-        }
-      ]
-    },
-    {
-      type: "separator"
-    },
+  mainSubmenu = mainSubmenu.concat([
     {
       role: "services",
       submenu: []
@@ -179,12 +167,17 @@ if (process.platform === "darwin") {
     },
     {
       type: "separator"
-    },
-    {
-      role: "quit"
     }
-  ];
+  ]);
+} else {
+  // linux or windows
 }
+
+mainSubmenu = mainSubmenu.concat([
+  {
+    role: "quit"
+  }
+]);
 
 const template = [
   {
@@ -417,12 +410,3 @@ ipcRenderer.on("console.log", (...args) => {
 ipcRenderer.on("console.error", (...args) => {
   console.error.apply(console, args.slice(1));
 });
-
-// CHROME EXTENSIONS
-
-// There's an issue w electron that they are fixing right now,
-// but it will work soon.
-if (process.env.NODE_ENV === "development") {
-  // remote.require('browser-window').removeDevToolsExtension("New React Developer Tools")
-  // remote.require('browser-window').addDevToolsExtension(require('path').join(__dirname, '..', 'extensions', 'react-devtools', 'shells', 'chrome'))
-}

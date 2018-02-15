@@ -117,21 +117,24 @@ function startServer(options, cb) {
       command = "./prism";
     }
 
-    commandDir = Path.join(__dirname, "..", "..", "proxy");
+    commandDir = Path.join(__dirname, "..", "..", "..", "app", "proxy");
     // args = ['run', '-c=./config.json', '-s=./spec.json']
     args = ["conduct", "serve", `-p=${process.env.PRISM_PORT}`];
   }
 
-  log(
-    "starting proxy with command",
-    commandDir,
-    command,
-    args,
-    process.env.SL_API_HOST
-  );
-  server = spawn(command, args, {
-    cwd: commandDir
-  });
+  log("starting prism with command", commandDir, command, args);
+
+  try {
+    server = spawn(command, args, {
+      cwd: commandDir
+    });
+  } catch (e) {
+    if (cb) {
+      cb(e);
+    }
+
+    return;
+  }
 
   server.stdout.on("data", function(data) {
     starting = false;
@@ -181,18 +184,20 @@ process.on("exit", function() {
   }
 });
 
-var serverFunctions = {};
+var serverFunctions = {
+  log
+};
 
 serverFunctions.start = function(options, cb, onCloseCb) {
   onClose = onCloseCb;
 
   if (!server || server.exitCode) {
-    log("initializing start");
+    log("initializing start prism");
     return startServer(options, cb);
   }
 
   if (!starting && server.pid) {
-    log("initializing restart", server);
+    log("initializing restart prism", server);
     serverFunctions.stop(function() {
       startServer(options, cb);
     });
@@ -201,10 +206,10 @@ serverFunctions.start = function(options, cb, onCloseCb) {
 
 serverFunctions.stop = function(cb) {
   if (server) {
-    log("initializing stop");
+    log("initializing stop prism");
     kill(server.pid, null, cb);
   } else {
-    log("tried to stop, but it's not running!");
+    log("tried to stop prism, but it's not running!");
     if (cb) {
       cb();
     }

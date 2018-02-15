@@ -4,14 +4,14 @@ const url = require("url");
 const windows = require("../windows");
 const config = require("../config");
 
-exports.initHost = ({ app, host } = {}) => {
+exports.init = ({ app } = {}) => {
   // PROXY SERVERS
 
-  const user = _.get(host, "proxy.user");
-  const pass = _.get(host, "proxy.pass");
+  const user = config.get("networking.proxy.user");
+  const pass = config.get("networking.proxy.pass");
 
   // respect any explicitly set proxies
-  const proxyUrl = _.get(host, "proxy.url");
+  const proxyUrl = config.get("networking.proxy.url");
   let parsedProxyUrl;
   if (proxyUrl) {
     try {
@@ -35,7 +35,7 @@ exports.initHost = ({ app, host } = {}) => {
   }
 
   // respect explicitly set proxy bypass
-  const bypassList = _.get(host, "proxy.bypass");
+  const bypassList = config.get("networking.proxy.bypass");
   if (bypassList) {
     console.log("Using bypassList", bypassList);
     process.env.NO_PROXY = bypassList;
@@ -62,11 +62,9 @@ exports.initHost = ({ app, host } = {}) => {
     if (!authUsername || !authPassword) {
       const mainWindow = windows.getMainWindow();
       if (mainWindow) {
-        config.data.set(
-          "hostError",
-          "Proxy requires basic auth, and none provided."
+        mainWindow.loadURL(
+          `stoplight://stoplight.io/desktop/settings/networking?flash=Your network proxy requires basic auth, and none provided&flash_type=error`
         );
-        mainWindow.loadURL(windows.internalUrl);
       }
     } else {
       callback(authUsername, authPassword);

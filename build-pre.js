@@ -1,7 +1,8 @@
 const fs = require("fs-extra");
-const f = require("fs");
 const request = require("request");
 const AdmZip = require("adm-zip");
+
+// setup prism binaries
 
 fs.removeSync("build-tmp");
 fs.removeSync("dist");
@@ -51,7 +52,7 @@ const mkProxyFiles = (os, arch) => {
     `${buildPath}/${proxyDetails.target}`
   );
 
-  f.chmodSync(`${buildPath}/${proxyDetails.target}`, "777");
+  fs.chmodSync(`${buildPath}/${proxyDetails.target}`, "777");
 };
 
 const mkFiles = () => {
@@ -74,9 +75,9 @@ request(
     }
   },
   (err, resp, body) => {
-    const zipUrl = `https://github.com/stoplightio/prism/releases/download/${JSON.parse(
-      body
-    ).tag_name}/bundle.zip`;
+    const zipUrl = `https://github.com/stoplightio/prism/releases/download/${
+      JSON.parse(body).tag_name
+    }/bundle.zip`;
     console.log("HTTP: Fetching latest zip.", zipUrl);
     request(zipUrl)
       .pipe(fs.createWriteStream("build-tmp/prism/bundle.zip"))
