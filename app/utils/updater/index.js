@@ -1,7 +1,7 @@
-const { ipcMain } = require("electron");
-const autoUpdater = require("electron-updater").autoUpdater;
+const { ipcMain } = require('electron');
+const autoUpdater = require('electron-updater').autoUpdater;
 
-const windows = require("../windows");
+const windows = require('../windows');
 
 autoUpdater.autoDownload = false;
 autoUpdater.fullChangelog = true;
@@ -10,50 +10,46 @@ let manualUpdateCheck = false;
 let cancelUpdateChecks = false;
 let lastCheck;
 
-autoUpdater.on("download-progress", progressObj => {
+autoUpdater.on('download-progress', progressObj => {
   if (windows.getMainWindow()) {
-    windows
-      .getMainWindow()
-      .webContents.send("updater.download-progress", progressObj);
+    windows.getMainWindow().webContents.send('updater.download-progress', progressObj);
   }
 });
 
-autoUpdater.on("error", err => {
+autoUpdater.on('error', err => {
   manualUpdateCheck = false;
 
   if (windows.getMainWindow()) {
-    windows.getMainWindow().webContents.send("updater.error", err);
+    windows.getMainWindow().webContents.send('updater.error', err);
   }
 });
 
-autoUpdater.on("checking-for-update", () => {
+autoUpdater.on('checking-for-update', () => {
   if (windows.getMainWindow()) {
-    windows.getMainWindow().webContents.send("updater.checking-for-update");
+    windows.getMainWindow().webContents.send('updater.checking-for-update');
   }
 });
 
-autoUpdater.on("update-available", info => {
+autoUpdater.on('update-available', info => {
   cancelUpdateChecks = true;
   manualUpdateCheck = false;
 
   if (windows.getMainWindow()) {
-    windows.getMainWindow().webContents.send("updater.update-available", info);
+    windows.getMainWindow().webContents.send('updater.update-available', info);
   }
 });
 
-autoUpdater.on("update-not-available", info => {
+autoUpdater.on('update-not-available', info => {
   manualUpdateCheck = false;
 
   if (windows.getMainWindow()) {
-    windows
-      .getMainWindow()
-      .webContents.send("updater.update-not-available", info);
+    windows.getMainWindow().webContents.send('updater.update-not-available', info);
   }
 });
 
-autoUpdater.on("update-downloaded", info => {
+autoUpdater.on('update-downloaded', info => {
   if (windows.getMainWindow()) {
-    windows.getMainWindow().webContents.send("updater.update-downloaded", info);
+    windows.getMainWindow().webContents.send('updater.update-downloaded', info);
   }
 });
 
@@ -68,14 +64,14 @@ exports.checkForUpdates = () => {
 };
 
 exports.init = ({ app, logger }) => {
-  if (process.platform !== "linux") {
+  if (process.platform !== 'linux') {
     exports.checkForUpdates();
 
     setInterval(() => {
       exports.checkForUpdates();
     }, 1000 * 60 * 30);
 
-    app.on("browser-window-focus", () => {
+    app.on('browser-window-focus', () => {
       const now = new Date();
 
       // auto check at most once every 5 minutes
@@ -87,27 +83,27 @@ exports.init = ({ app, logger }) => {
     });
   }
 
-  ipcMain.on("updater.check", event => {
+  ipcMain.on('updater.check', event => {
     manualUpdateCheck = true;
 
     if (logger) {
-      logger("updater.check");
+      logger('updater.check');
     }
 
     exports.checkForUpdates();
   });
 
-  ipcMain.on("updater.install", event => {
+  ipcMain.on('updater.install', event => {
     if (logger) {
-      logger("updater.install");
+      logger('updater.install');
     }
 
     autoUpdater.quitAndInstall();
   });
 
-  ipcMain.on("updater.download", event => {
+  ipcMain.on('updater.download', event => {
     if (logger) {
-      logger("updater.download");
+      logger('updater.download');
     }
 
     autoUpdater.downloadUpdate();

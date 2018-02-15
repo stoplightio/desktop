@@ -1,42 +1,33 @@
-const Path = require("path");
+const Path = require('path');
 
 // Setup environment variables
-const pjson = require("./package.json");
-process.env.NODE_ENV =
-  process.env.NODE_ENV || pjson.environment || "development";
-if (process.env.NODE_ENV === "development") {
-  require("dotenv").config({
-    path: Path.resolve(__dirname, "development.env")
+const pjson = require('./package.json');
+process.env.NODE_ENV = process.env.NODE_ENV || pjson.environment || 'development';
+if (process.env.NODE_ENV === 'development') {
+  require('dotenv').config({
+    path: Path.resolve(__dirname, 'development.env'),
   });
 } else {
-  require("dotenv").config({
-    path: Path.resolve(__dirname, ".env")
+  require('dotenv').config({
+    path: Path.resolve(__dirname, '.env'),
   });
 }
 
-const _ = require("lodash");
-const electron = require("electron");
-const os = require("os");
-const url = require("url");
-const request = require("request");
+const _ = require('lodash');
+const electron = require('electron');
+const os = require('os');
+const url = require('url');
+const request = require('request');
 
-const windowUtils = require("./utils/windows");
-const networkingUtils = require("./utils/networking");
-const configUtils = require("./utils/config");
-const prismUtils = require("./utils/prism");
-const sessionUtils = require("./utils/session");
-const updaterUtils = require("./utils/updater");
-const oauthUtils = require("./utils/oauth");
+const windowUtils = require('./utils/windows');
+const networkingUtils = require('./utils/networking');
+const configUtils = require('./utils/config');
+const prismUtils = require('./utils/prism');
+const sessionUtils = require('./utils/session');
+const updaterUtils = require('./utils/updater');
+const oauthUtils = require('./utils/oauth');
 
-const {
-  app,
-  ipcMain,
-  BrowserWindow,
-  dialog,
-  shell,
-  session,
-  protocol
-} = electron;
+const { app, ipcMain, BrowserWindow, dialog, shell, session, protocol } = electron;
 
 configUtils.init();
 networkingUtils.init({ app });
@@ -64,7 +55,7 @@ const _log = function(baseArgs, args) {
 };
 
 // This function sends messages to the mainWindow, to log stuff in developer tools
-const browserLoggerBaseArgs = ["console.log"];
+const browserLoggerBaseArgs = ['console.log'];
 const browserLogger = function() {
   if (windowUtils.getMainWindow()) {
     const args = new Array(arguments.length);
@@ -76,7 +67,7 @@ const browserLogger = function() {
   }
 };
 
-const proxyLoggerBaseArgs = ["proxy.log"];
+const proxyLoggerBaseArgs = ['proxy.log'];
 const proxyLogger = function() {
   if (windowUtils.getMainWindow()) {
     const args = new Array(arguments.length);
@@ -94,13 +85,13 @@ prismUtils.setLogger(proxyLogger);
 // END LOGGING
 
 // Quit when all windowUtils are closed.
-app.on("window-all-closed", () => {
+app.on('window-all-closed', () => {
   app.quit();
 });
 
 // Shutdown the servers on quit
 let serversStopped = false;
-app.on("will-quit", event => {
+app.on('will-quit', event => {
   if (!serversStopped) {
     event.preventDefault();
     prismUtils.stop(() => {
@@ -112,11 +103,11 @@ app.on("will-quit", event => {
   }
 });
 
-app.setAsDefaultProtocolClient("stoplight");
-protocol.registerStandardSchemes(["stoplight"], { secure: true });
-app.on("ready", () => {
+app.setAsDefaultProtocolClient('stoplight');
+protocol.registerStandardSchemes(['stoplight'], { secure: true });
+app.on('ready', () => {
   protocol.registerFileProtocol(
-    "stoplight",
+    'stoplight',
     (request, callback) => {
       if (!request || !request.url) {
         return callback(Path.normalize(`${__dirname}/index.html`));
@@ -127,7 +118,7 @@ app.on("ready", () => {
        *
        * stoplight://stoplight.io/foo/bar -> /foo/bar
        */
-      let url = request.url.split("stoplight.io")[1];
+      let url = request.url.split('stoplight.io')[1];
 
       /**
        * If not asset url, then its an app route so we just render the index file.
@@ -135,18 +126,10 @@ app.on("ready", () => {
        * App route: stoplight://stoplight.io/users/foo
        * Asset: stoplight://stoplight.io/js/foo.js (note period in url)
        */
-      const firstPart = url.split("/")[1];
+      const firstPart = url ? url.split('/')[1] : '';
       if (
         !firstPart ||
-        ![
-          "index.html",
-          "css",
-          "static",
-          "js",
-          "fonts",
-          "uploads",
-          "images"
-        ].includes(firstPart)
+        !['index.html', 'css', 'static', 'js', 'fonts', 'uploads', 'images'].includes(firstPart)
       ) {
         return callback(Path.normalize(`${__dirname}/index.html`));
       }
@@ -154,7 +137,7 @@ app.on("ready", () => {
       callback(Path.normalize(`${__dirname}/build/${url}`));
     },
     err => {
-      if (err) console.error("Failed to register protocol", err);
+      if (err) console.error('Failed to register protocol', err);
     }
   );
 
@@ -165,14 +148,14 @@ app.on("ready", () => {
   });
 });
 
-ipcMain.on("app.relaunch", () => {
+ipcMain.on('app.relaunch', () => {
   app.relaunch();
   app.quit();
 });
 
-ipcMain.on("app.showSettings", () => {
+ipcMain.on('app.showSettings', () => {
   if (windowUtils.getMainWindow()) {
-    windowUtils.getMainWindow().webContents.send("route.settings");
+    windowUtils.getMainWindow().webContents.send('route.settings');
   }
 });
 
@@ -180,43 +163,43 @@ ipcMain.on("app.showSettings", () => {
 // Events available to the browser
 //
 
-ipcMain.on("proxy.start", (event, options, env) => {
+ipcMain.on('proxy.start', (event, options, env) => {
   try {
     prismUtils.start(
       options,
       err => {
         if (err) {
-          prismUtils.log("error starting prism server", e);
-          event.sender.send("proxy.start.reject");
+          prismUtils.log('error starting prism server', e);
+          event.sender.send('proxy.start.reject');
         } else {
-          event.sender.send("proxy.start.resolve");
+          event.sender.send('proxy.start.resolve');
         }
       },
       code => {
         if (windowUtils.getMainWindow()) {
-          windowUtils.getMainWindow().webContents.send("proxy.stopped", code);
+          windowUtils.getMainWindow().webContents.send('proxy.stopped', code);
         }
       }
     );
   } catch (e) {
-    prismUtils.log("error starting prism server", e);
-    event.sender.send("proxy.start.reject");
+    prismUtils.log('error starting prism server', e);
+    event.sender.send('proxy.start.reject');
   }
 });
 
-ipcMain.on("proxy.stop", event => {
+ipcMain.on('proxy.stop', event => {
   try {
     prismUtils.stop(() => {
-      event.sender.send("proxy.stop.resolve");
+      event.sender.send('proxy.stop.resolve');
     });
   } catch (e) {
-    prismUtils.log("error stopping prism", e);
-    event.sender.send("proxy.stop.reject");
+    prismUtils.log('error stopping prism', e);
+    event.sender.send('proxy.stop.reject');
   }
 });
 
 // DEEP LINKING
-app.on("open-url", function(event, url) {
+app.on('open-url', function(event, url) {
   if (windowUtils.getMainWindow()) {
     windowUtils.getMainWindow().show();
   }

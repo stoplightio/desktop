@@ -1,17 +1,17 @@
-const _ = require("lodash");
-const url = require("url");
+const _ = require('lodash');
+const url = require('url');
 
-const windows = require("../windows");
-const config = require("../config");
+const windows = require('../windows');
+const config = require('../config');
 
 exports.init = ({ app } = {}) => {
   // PROXY SERVERS
 
-  const user = config.get("networking.proxy.user");
-  const pass = config.get("networking.proxy.pass");
+  const user = config.get('networking.proxy.user');
+  const pass = config.get('networking.proxy.pass');
 
   // respect any explicitly set proxies
-  const proxyUrl = config.get("networking.proxy.url");
+  const proxyUrl = config.get('networking.proxy.url');
   let parsedProxyUrl;
   if (proxyUrl) {
     try {
@@ -21,41 +21,36 @@ exports.init = ({ app } = {}) => {
         parsedProxyUrl.auth = `${user}:${pass}`;
       }
 
-      console.log("Using proxyUrl", url.format(parsedProxyUrl));
-      process.env.HTTPS_PROXY = process.env.HTTP_PROXY = url.format(
-        parsedProxyUrl
-      );
+      console.log('Using proxyUrl', url.format(parsedProxyUrl));
+      process.env.HTTPS_PROXY = process.env.HTTP_PROXY = url.format(parsedProxyUrl);
       app.commandLine.appendSwitch(
-        "proxy-server",
-        parsedProxyUrl.protocol + "//" + parsedProxyUrl.host
+        'proxy-server',
+        parsedProxyUrl.protocol + '//' + parsedProxyUrl.host
       );
     } catch (e) {
-      console.log("invalid proxyUrl", e);
+      console.log('invalid proxyUrl', e);
     }
   }
 
   // respect explicitly set proxy bypass
-  const bypassList = config.get("networking.proxy.bypass");
+  const bypassList = config.get('networking.proxy.bypass');
   if (bypassList) {
-    console.log("Using bypassList", bypassList);
+    console.log('Using bypassList', bypassList);
     process.env.NO_PROXY = bypassList;
-    app.commandLine.appendSwitch(
-      "proxy-bypass-list",
-      bypassList.replace(/,/g, ";")
-    );
+    app.commandLine.appendSwitch('proxy-bypass-list', bypassList.replace(/,/g, ';'));
   } else if (proxyUrl) {
-    console.log("Using bypassList", "<local>");
+    console.log('Using bypassList', '<local>');
     process.env.NO_PROXY = bypassList;
-    app.commandLine.appendSwitch("proxy-bypass-list", "<local>");
+    app.commandLine.appendSwitch('proxy-bypass-list', '<local>');
   }
 
-  app.on("login", function(event, webContents, request, authInfo, callback) {
+  app.on('login', function(event, webContents, request, authInfo, callback) {
     event.preventDefault();
 
-    console.log("proxyUrl requires basic auth");
+    console.log('proxyUrl requires basic auth');
 
-    const auth = _.get(parsedProxyUrl, "auth", "");
-    const authParts = (auth || "").split(":");
+    const auth = _.get(parsedProxyUrl, 'auth', '');
+    const authParts = (auth || '').split(':');
     const authUsername = _.first(authParts) || user;
     const authPassword = _.last(authParts) || pass;
 

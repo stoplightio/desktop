@@ -1,40 +1,35 @@
-const Path = require("path");
-const os = require("os");
-const fs = require("fs-extra");
-const electron = require("electron");
-const fileWatcher = require("chokidar");
-const OAuth2 = require("simple-oauth2");
-const shortid = require("shortid");
-const _ = require("lodash");
+const Path = require('path');
+const os = require('os');
+const fs = require('fs-extra');
+const electron = require('electron');
+const fileWatcher = require('chokidar');
+const OAuth2 = require('simple-oauth2');
+const shortid = require('shortid');
+const _ = require('lodash');
 
 const { ipcRenderer, remote, clipboard } = electron;
 const { app, Menu, shell, dialog } = remote;
-const dataPath = app.getPath("appData");
+const dataPath = app.getPath('appData');
 
-const config = remote.require("./utils/config");
+const config = remote.require('./utils/config');
 
 const env = remote.process.env;
-if (env.NODE_ENV === "development") {
-  require("devtron").install();
+if (env.NODE_ENV === 'development') {
+  require('devtron').install();
 }
 
-const createOAuth2 = ({
-  client_id,
-  client_secret,
-  access_token_url,
-  authorize_url
-}) =>
+const createOAuth2 = ({ client_id, client_secret, access_token_url, authorize_url }) =>
   OAuth2.create({
     client: {
       id: client_id,
-      secret: client_secret
+      secret: client_secret,
     },
     auth: {
       tokenHost: access_token_url,
-      tokenPath: " ",
+      tokenPath: ' ',
       authorizeHost: authorize_url,
-      authorizePath: " "
-    }
+      authorizePath: ' ',
+    },
   });
 
 // The values available to our dashboard
@@ -46,12 +41,12 @@ global.Electron = {
   ipc: ipcRenderer,
   config: {
     get: config.get,
-    set: config.set
+    set: config.set,
   },
   events: {
     onOpenFile: null, // app must implement this to hook into file open events
     onOpenUrl: null, // app must implement this to hook into url open events
-    onOpenAbout: null // app must implement this to hook into open about
+    onOpenAbout: null, // app must implement this to hook into open about
   },
   env: {
     name: env.NODE_ENV,
@@ -59,19 +54,12 @@ global.Electron = {
     platform: os.platform(),
     version: app.getVersion(),
     dataPath,
-    http_proxy:
-      env.HTTPS_PROXY || env.https_proxy || env.HTTP_PROXY || env.http_proxy,
+    http_proxy: env.HTTPS_PROXY || env.https_proxy || env.HTTP_PROXY || env.http_proxy,
     no_proxy: env.NO_PROXY || env.no_proxy,
     http_proxy_user:
-      env.HTTPS_PROXY_USER ||
-      env.https_proxy_user ||
-      env.HTTP_PROXY_USER ||
-      env.http_proxy_user,
+      env.HTTPS_PROXY_USER || env.https_proxy_user || env.HTTP_PROXY_USER || env.http_proxy_user,
     http_proxy_pass:
-      env.HTTPS_PROXY_PASS ||
-      env.https_proxy_pass ||
-      env.HTTP_PROXY_PASS ||
-      env.http_proxy_pass
+      env.HTTPS_PROXY_PASS || env.https_proxy_pass || env.HTTP_PROXY_PASS || env.http_proxy_pass,
   },
   oauth: {
     //credentials: { scope, client_id, client_secret, access_token_url, authorize_url }
@@ -80,7 +68,7 @@ global.Electron = {
 
       return oauth2instance.authorizationCode.authorizeURL({
         scope: credentials.scope,
-        state: shortid.generate()
+        state: shortid.generate(),
       });
     },
 
@@ -93,18 +81,18 @@ global.Electron = {
       const oauth2instance = createOAuth2(credentials);
 
       return oauth2instance.authorizationCode.getToken({
-        code: credentials.code
+        code: credentials.code,
       });
-    }
-  }
+    },
+  },
 };
 
-app.on("open-file", (e, path) => {
+app.on('open-file', (e, path) => {
   if (Electron.events.onOpenFile) {
     Electron.events.onOpenFile(e, path);
   }
 });
-app.on("open-url", (e, url) => {
+app.on('open-url', (e, url) => {
   if (Electron.events.onOpenUrl) {
     Electron.events.onOpenUrl(e, url);
   }
@@ -114,60 +102,60 @@ app.on("open-url", (e, url) => {
 
 let mainSubmenu = [
   {
-    label: "About Stoplight",
+    label: 'About Stoplight',
     click: function() {
       if (Electron.events.onOpenAbout) {
         Electron.events.onOpenAbout();
       }
-    }
+    },
   },
   {
-    label: "Check for Updates",
+    label: 'Check for Updates',
     click: function() {
       if (Electron.events.onOpenAbout) {
         Electron.events.onOpenAbout();
       }
 
-      if (process.platform !== "linux") {
-        ipcRenderer.send("updater.check");
+      if (process.platform !== 'linux') {
+        ipcRenderer.send('updater.check');
       }
-    }
+    },
   },
   {
-    type: "separator"
+    type: 'separator',
   },
   {
-    label: "Preferences",
+    label: 'Preferences',
     click() {
-      ipcRenderer.send("app.showSettings");
-    }
+      ipcRenderer.send('app.showSettings');
+    },
   },
   {
-    type: "separator"
-  }
+    type: 'separator',
+  },
 ];
 
-if (process.platform === "darwin") {
+if (process.platform === 'darwin') {
   mainSubmenu = mainSubmenu.concat([
     {
-      role: "services",
-      submenu: []
+      role: 'services',
+      submenu: [],
     },
     {
-      type: "separator"
+      type: 'separator',
     },
     {
-      role: "hide"
+      role: 'hide',
     },
     {
-      role: "hideothers"
+      role: 'hideothers',
     },
     {
-      role: "unhide"
+      role: 'unhide',
     },
     {
-      type: "separator"
-    }
+      type: 'separator',
+    },
   ]);
 } else {
   // linux or windows
@@ -175,14 +163,14 @@ if (process.platform === "darwin") {
 
 mainSubmenu = mainSubmenu.concat([
   {
-    role: "quit"
-  }
+    role: 'quit',
+  },
 ]);
 
 const template = [
   {
     label: app.getName(),
-    submenu: mainSubmenu
+    submenu: mainSubmenu,
   },
   // TODO once we support local git repos
   // {
@@ -213,188 +201,177 @@ const template = [
   //   ]
   // },
   {
-    label: "Edit",
+    label: 'Edit',
     submenu: [
       {
-        role: "undo"
+        role: 'undo',
       },
       {
-        role: "redo"
+        role: 'redo',
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        label: "Back",
-        accelerator: "CmdOrCtrl+[",
+        label: 'Back',
+        accelerator: 'CmdOrCtrl+[',
         click(item, focusedWindow) {
           const contents = focusedWindow ? focusedWindow.webContents : null;
           if (contents && contents.canGoBack()) {
             contents.goBack();
           }
-        }
+        },
       },
       {
-        label: "Forward",
-        accelerator: "CmdOrCtrl+]",
+        label: 'Forward',
+        accelerator: 'CmdOrCtrl+]',
         click(item, focusedWindow) {
           const contents = focusedWindow ? focusedWindow.webContents : null;
           if (contents && contents.canGoForward()) {
             contents.goForward();
           }
-        }
+        },
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        label: "Copy Current URL to Clipboard",
-        accelerator: "CmdOrCtrl+Shift+C",
+        label: 'Copy Current Location to Clipboard',
+        accelerator: 'CmdOrCtrl+Shift+C',
         click(item, focusedWindow) {
           const contents = focusedWindow ? focusedWindow.webContents : null;
           if (contents) {
-            const url = contents.getURL();
+            let url = contents.getURL();
             if (url) {
+              url = url.replace('stoplight://stoplight.io', '');
+
               clipboard.writeText(url);
-              new Notification("Copied!", {
-                title: "Copied!",
-                body: url
+              new Notification('Copied!', {
+                title: 'Copied!',
+                body: url,
               });
             }
           }
-        }
+        },
       },
       {
-        label: "Open Current URL in Browser",
-        accelerator: "CmdOrCtrl+Shift+O",
-        click(item, focusedWindow) {
-          const contents = focusedWindow ? focusedWindow.webContents : null;
-          if (contents) {
-            const url = contents.getURL();
-            if (url) {
-              shell.openExternal(url);
-            }
-          }
-        }
+        type: 'separator',
       },
       {
-        type: "separator"
+        role: 'cut',
       },
       {
-        role: "cut"
+        role: 'copy',
       },
       {
-        role: "copy"
+        role: 'paste',
       },
       {
-        role: "paste"
+        role: 'pasteandmatchstyle',
       },
       {
-        role: "pasteandmatchstyle"
+        role: 'delete',
       },
       {
-        role: "delete"
+        role: 'selectall',
       },
-      {
-        role: "selectall"
-      }
-    ]
+    ],
   },
   {
-    label: "View",
+    label: 'View',
     submenu: [
       {
-        role: "reload"
+        role: 'reload',
       },
       {
-        role: "toggledevtools"
+        role: 'toggledevtools',
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        role: "resetzoom"
+        role: 'resetzoom',
       },
       {
-        role: "zoomin"
+        role: 'zoomin',
       },
       {
-        role: "zoomout"
+        role: 'zoomout',
       },
       {
-        type: "separator"
+        type: 'separator',
       },
       {
-        role: "togglefullscreen"
-      }
-    ]
+        role: 'togglefullscreen',
+      },
+    ],
   },
   {
-    role: "window",
+    role: 'window',
     submenu: [
       {
-        role: "minimize"
+        role: 'minimize',
       },
       {
-        role: "close"
-      }
-    ]
+        role: 'close',
+      },
+    ],
   },
   {
-    role: "help",
+    role: 'help',
     submenu: [
       {
-        label: "Learn More",
+        label: 'Learn More',
         click() {
-          shell.openExternal("https://help.stoplight.io");
-        }
-      }
-    ]
-  }
+          shell.openExternal('https://help.stoplight.io');
+        },
+      },
+    ],
+  },
 ];
 
-if (process.platform === "darwin") {
+if (process.platform === 'darwin') {
   // Edit menu.
   template[2].submenu.push(
     {
-      type: "separator"
+      type: 'separator',
     },
     {
-      label: "Speech",
+      label: 'Speech',
       submenu: [
         {
-          role: "startspeaking"
+          role: 'startspeaking',
         },
         {
-          role: "stopspeaking"
-        }
-      ]
+          role: 'stopspeaking',
+        },
+      ],
     }
   );
 
   // Window menu.
   template[4].submenu = [
     {
-      label: "Close",
-      accelerator: "CmdOrCtrl+W",
-      role: "close"
+      label: 'Close',
+      accelerator: 'CmdOrCtrl+W',
+      role: 'close',
     },
     {
-      label: "Minimize",
-      accelerator: "CmdOrCtrl+M",
-      role: "minimize"
+      label: 'Minimize',
+      accelerator: 'CmdOrCtrl+M',
+      role: 'minimize',
     },
     {
-      label: "Zoom",
-      role: "zoom"
+      label: 'Zoom',
+      role: 'zoom',
     },
     {
-      type: "separator"
+      type: 'separator',
     },
     {
-      label: "Bring All to Front",
-      role: "front"
-    }
+      label: 'Bring All to Front',
+      role: 'front',
+    },
   ];
 }
 
@@ -403,10 +380,10 @@ Menu.setApplicationMenu(menu);
 
 // DEV TOOLS LOGGING
 
-ipcRenderer.on("console.log", (...args) => {
+ipcRenderer.on('console.log', (...args) => {
   console.log.apply(console, args.slice(1));
 });
 
-ipcRenderer.on("console.error", (...args) => {
+ipcRenderer.on('console.error', (...args) => {
   console.error.apply(console, args.slice(1));
 });

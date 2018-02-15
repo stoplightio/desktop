@@ -8,21 +8,17 @@
     "start": "NODE_ENV=development electron ./app",
     "setup": "rm -R node_modules && yarn",
     "postinstall": "electron-builder install-app-deps",
-    "electron:sign":
-      "codesign --deep --force --verbose --sign - node_modules/electron/dist/Electron.app",
+    "electron:sign": "codesign --deep --force --verbose --sign - node_modules/electron/dist/Electron.app",
     "build:normalize": "node build-normalize",
     "build:pre": "node build-pre",
     "build:post": "node build-post",
     "build": " build --mac --linux --win --x64 --ia32",
     "release": "build --mac --linux --win --x64 --ia32",
-    "build:production":
-      "NODE_ENV=production npm run build:normalize && npm run build:pre && npm run build && npm run build:post",
-    "build:staging":
-      "NODE_ENV=staging npm run build:normalize && npm run build:pre && npm run build && npm run build:post",
-    "release:production":
-      "NODE_ENV=production npm run build:normalize && npm run build:pre && npm run release && npm run build:post",
-    "release:staging":
-      "NODE_ENV=staging npm run build:normalize && npm run build:pre && npm run release && npm run build:post"
+    "build:production": "NODE_ENV=production npm run build:normalize && npm run build:pre && npm run build && npm run build:post",
+    "build:staging": "NODE_ENV=staging npm run build:normalize && npm run build:pre && npm run build && npm run build:post",
+    "release:production": "NODE_ENV=production npm run build:normalize && npm run build:pre && npm run release && npm run build:post",
+    "release:staging": "NODE_ENV=staging npm run build:normalize && npm run build:pre && npm run release && npm run build:post",
+    "format": "prettier --write \"**/*.js\""
   },
   "devDependencies": {
     "adm-zip": "0.4.x",
@@ -30,6 +26,7 @@
     "electron": "1.8.2",
     "electron-builder": "19.47.1",
     "fs-extra": "5.x.x",
+    "prettier": "1.10.2",
     "request": "2.x.x"
   },
   "build": {
@@ -38,20 +35,30 @@
       "extendInfo": {
         "CFBundleURLTypes": [
           {
-            "CFBundleURLSchemes": ["stoplight"],
+            "CFBundleURLSchemes": [
+              "stoplight"
+            ],
             "CFBundleURLName": "Stoplight Protocol"
           }
         ]
       },
       "category": "public.app-category.developer-tools",
-      "target": ["dmg", "zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "linux": {
       "category": "Development",
-      "target": ["deb", "AppImage"]
+      "target": [
+        "deb",
+        "AppImage"
+      ]
     },
     "win": {
-      "target": ["nsis"]
+      "target": [
+        "nsis"
+      ]
     },
     "compression": "normal",
     "asar": true,

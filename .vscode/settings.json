@@ -1,0 +1,28 @@
+{
+  "editor.tabSize": 2,
+  "editor.renderWhitespace": "boundary",
+  "editor.cursorStyle": "line",
+  "editor.rulers": [100],
+  "editor.formatOnSave": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "prettier.eslintIntegration": true,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/node_modules/**": true,
+    "**/build/**": true,
+    "**/dist/**": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/dist/**": true
+  },
+  "search.exclude": {
+    "**/.git/objects": true,
+    "**/node_modules": true,
+    "**/yarn.lock": true,
+    "**/build": true,
+    "**/dist": true
+  }
+}

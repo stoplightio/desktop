@@ -1,8 +1,8 @@
-const { BrowserWindow, ipcMain, session } = require("electron");
+const { BrowserWindow, ipcMain, session } = require('electron');
 
 function getPopupSize(provider) {
   switch (provider) {
-    case "github":
+    case 'github':
       return { width: 1020, height: 644 };
     default:
       return { width: 1020, height: 644 };
@@ -10,7 +10,7 @@ function getPopupSize(provider) {
 }
 
 exports.init = () => {
-  ipcMain.on("open.oauth.window", (event, { provider, url, param }) => {
+  ipcMain.on('open.oauth.window', (event, { provider, url, param }) => {
     const winSize = getPopupSize(provider);
     const authWindow = new BrowserWindow({
       width: winSize.width,
@@ -23,9 +23,9 @@ exports.init = () => {
       title: `${provider} Authorization`,
       webPreferences: {
         devTools: false,
-        nodeIntegration: false
+        nodeIntegration: false,
       },
-      session: session.fromPartition("persist:main", { cache: false })
+      session: session.fromPartition('persist:main', { cache: false }),
     });
 
     authWindow.loadURL(url);
@@ -33,21 +33,18 @@ exports.init = () => {
 
     let finalUrl;
 
-    authWindow.on("closed", () => {
-      event.sender.send("close.oauth.window", finalUrl);
+    authWindow.on('closed', () => {
+      event.sender.send('close.oauth.window', finalUrl);
     });
 
-    authWindow.webContents.on(
-      "did-get-redirect-request",
-      (e, oldUrl, newUrl) => {
-        if (newUrl.indexOf(param) !== -1) {
-          finalUrl = newUrl;
-          authWindow.close();
-        }
+    authWindow.webContents.on('did-get-redirect-request', (e, oldUrl, newUrl) => {
+      if (newUrl.indexOf(param) !== -1) {
+        finalUrl = newUrl;
+        authWindow.close();
       }
-    );
+    });
 
-    authWindow.webContents.on("will-navigate", (e, url) => {
+    authWindow.webContents.on('will-navigate', (e, url) => {
       if (url.indexOf(param) !== -1) {
         finalUrl = url;
         authWindow.close();
