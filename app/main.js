@@ -24,7 +24,6 @@ const networkingUtils = require('./utils/networking');
 const configUtils = require('./utils/config');
 const prismUtils = require('./utils/prism');
 const sessionUtils = require('./utils/session');
-const updaterUtils = require('./utils/updater');
 const oauthUtils = require('./utils/oauth');
 
 const { app, ipcMain, BrowserWindow, dialog, shell, session, protocol } = electron;
@@ -118,7 +117,7 @@ app.on('ready', () => {
        *
        * stoplight://stoplight.io/foo/bar -> /foo/bar
        */
-      let url = request.url.split('stoplight.io')[1];
+      let url = request.url.split('stoplight.local')[1];
 
       /**
        * If not asset url, then its an app route so we just render the index file.
@@ -142,9 +141,10 @@ app.on('ready', () => {
   );
 
   oauthUtils.init();
+  windowUtils.createWindow({ app, logger: browserLogger });
+
   sessionUtils.init({ app, logger: browserLogger }, () => {
-    windowUtils.createWindow();
-    updaterUtils.init({ app, logger: browserLogger });
+    windowUtils.loadApp();
   });
 });
 

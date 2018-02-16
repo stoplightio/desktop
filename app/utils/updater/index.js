@@ -6,6 +6,7 @@ const windows = require('../windows');
 autoUpdater.autoDownload = false;
 autoUpdater.fullChangelog = true;
 
+let hasInitted = false;
 let manualUpdateCheck = false;
 let cancelUpdateChecks = false;
 let lastCheck;
@@ -60,10 +61,18 @@ exports.checkForUpdates = () => {
 
   lastCheck = new Date();
 
-  autoUpdater.checkForUpdates();
+  try {
+    autoUpdater.checkForUpdates();
+  } catch (e) {
+    console.log('checkForUpdates failed', e);
+  }
 };
 
 exports.init = ({ app, logger }) => {
+  if (hasInitted) return;
+
+  hasInitted = true;
+
   if (process.platform !== 'linux') {
     exports.checkForUpdates();
 

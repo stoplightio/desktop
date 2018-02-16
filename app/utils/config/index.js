@@ -16,7 +16,7 @@ exports.get = path => {
 
 exports.set = (path, value) => {
   if (config) {
-    config.set(path, JSON.parse(JSON.stringify(value)));
+    config.set(path, value);
   }
 };
 
@@ -24,15 +24,15 @@ exports.init = () => {
   // don't store defaults in config, so that not written to disk
   defaults = {
     networking: {
-      apiHost: process.env.SL_API_HOST,
-      exporterHost: process.env.SL_EXPORTER_HOST,
-      prismHost: process.env.SL_PRISM_HOST,
+      apiHost: process.env.SL_API_HOST || '',
+      exporterHost: process.env.SL_EXPORTER_HOST || '',
+      prismHost: process.env.SL_PRISM_HOST || '',
 
       proxy: {
-        url: '',
-        bypass: '',
-        user: '',
-        pass: '',
+        url: process.env.HTTPS_PROXY || process.env.HTTP_PROXY || '',
+        bypass: process.env.NO_PROXY || '',
+        user: process.env.PROXY_USER || '',
+        pass: process.env.PROXY_PASS || '',
       },
     },
 

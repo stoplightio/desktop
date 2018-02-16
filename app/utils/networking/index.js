@@ -1,8 +1,11 @@
 const _ = require('lodash');
 const url = require('url');
+const { dialog } = require('electron');
 
 const windows = require('../windows');
 const config = require('../config');
+
+let hasShownNetworkingError;
 
 exports.init = ({ app } = {}) => {
   // PROXY SERVERS
@@ -33,21 +36,24 @@ exports.init = ({ app } = {}) => {
   }
 
   // respect explicitly set proxy bypass
-  const bypassList = config.get('networking.proxy.bypass');
+  let bypassList = config.get('networking.proxy.bypass');
+  if (bypassList) {
+    bypassList = `stoplight.local;${bypassList.replace(/,/g, ';')}`;
+  } else if (proxyUrl) {
+    bypassList = 'stoplight.local;<local>';
+  }
   if (bypassList) {
     console.log('Using bypassList', bypassList);
     process.env.NO_PROXY = bypassList;
-    app.commandLine.appendSwitch('proxy-bypass-list', bypassList.replace(/,/g, ';'));
-  } else if (proxyUrl) {
-    console.log('Using bypassList', '<local>');
-    process.env.NO_PROXY = bypassList;
-    app.commandLine.appendSwitch('proxy-bypass-list', '<local>');
+    app.commandLine.appendSwitch('proxy-bypass-list', bypassList);
   }
 
   app.on('login', function(event, webContents, request, authInfo, callback) {
     event.preventDefault();
 
-    console.log('proxyUrl requires basic auth');
+    if (request && request.url && request.url.match('stoplight.local/desktop')) {
+      return;
+    }
 
     const auth = _.get(parsedProxyUrl, 'auth', '');
     const authParts = (auth || '').split(':');
@@ -55,11 +61,25 @@ exports.init = ({ app } = {}) => {
     const authPassword = _.last(authParts) || pass;
 
     if (!authUsername || !authPassword) {
-      const mainWindow = windows.getMainWindow();
-      if (mainWindow) {
-        mainWindow.loadURL(
-          `stoplight://stoplight.io/desktop/settings/networking?flash=Your network proxy requires basic auth, and none provided&flash_type=error`
+      console.log(
+        'Your proxy requires basic auth, navigating to desktop preferences.',
+        request.url
+      );
+
+      if (!hasShownNetworkingError) {
+        hasShownNetworkingError = true;
+
+        dialog.showErrorBox(
+          'Network Error',
+          'Your network proxy requires basic auth, and none provided. Please update the basic auth settings on the desktop preferences screen.'
         );
+
+        const mainWindow = windows.getMainWindow();
+        if (mainWindow) {
+          mainWindow.loadURL(`stoplight://stoplight.local/desktop/settings/networking`);
+        } else {
+          console.log('Hmm, mainWindow not instantiated. Cannot navigate to preferences!');
+        }
       }
     } else {
       callback(authUsername, authPassword);

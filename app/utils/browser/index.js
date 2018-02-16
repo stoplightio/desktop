@@ -40,8 +40,12 @@ global.Electron = {
   fileWatcher,
   ipc: ipcRenderer,
   config: {
-    get: config.get,
-    set: config.set,
+    get: path => {
+      return _.cloneDeep(config.get(path));
+    },
+    set: (path, value) => {
+      return config.set(path, JSON.parse(JSON.stringify(value)));
+    },
   },
   events: {
     onOpenFile: null, // app must implement this to hook into file open events
@@ -243,7 +247,7 @@ const template = [
           if (contents) {
             let url = contents.getURL();
             if (url) {
-              url = url.replace('stoplight://stoplight.io', '');
+              url = url.replace('stoplight://stoplight.local', '');
 
               clipboard.writeText(url);
               new Notification('Copied!', {

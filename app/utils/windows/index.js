@@ -5,6 +5,8 @@ const windowStateKeeper = require('electron-window-state');
 
 const { BrowserWindow, shell, dialog } = electron;
 
+const updaterUtils = require('../updater');
+
 let mainWindow;
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -13,7 +15,7 @@ exports.getMainWindow = () => {
   return mainWindow;
 };
 
-exports.createWindow = ({ targetWindow } = {}) => {
+exports.createWindow = ({ app, logger, targetWindow } = {}) => {
   const { screen } = electron;
   const size = screen.getPrimaryDisplay().workAreaSize;
 
@@ -39,12 +41,6 @@ exports.createWindow = ({ targetWindow } = {}) => {
     });
 
   mainWindowState.manage(mainWindow);
-
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:3100');
-  } else {
-    mainWindow.loadURL('stoplight://stoplight.io');
-  }
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
@@ -87,6 +83,10 @@ exports.createWindow = ({ targetWindow } = {}) => {
     }
   });
 
+  mainWindow.webContents.on('did-finish-load', event => {
+    updaterUtils.init({ app, logger });
+  });
+
   // Add prompt before quiting an app if onbeforeunload event is fired.
   // This event is supported by electron 1.7.3 and above
   // https://github.com/electron/electron/issues/2579
@@ -104,4 +104,16 @@ exports.createWindow = ({ targetWindow } = {}) => {
       event.preventDefault();
     }
   });
+};
+
+exports.loadApp = () => {
+  if (mainWindow) {
+    if (isDev) {
+      mainWindow.loadURL('http://localhost:3100');
+    } else {
+      mainWindow.loadURL('stoplight://stoplight.local');
+    }
+  } else {
+    console.log('You must instantiate a mainWindow before calling loadApp');
+  }
 };
