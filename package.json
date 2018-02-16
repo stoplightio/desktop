@@ -12,7 +12,7 @@
     "build:normalize": "node build-normalize",
     "build:pre": "node build-pre",
     "build:post": "node build-post",
-    "build": " build --mac --linux --win --x64 --ia32",
+    "build": "build --mac --linux --win --x64 --ia32",
     "release": "build --mac --linux --win --x64 --ia32",
     "build:production": "NODE_ENV=production npm run build:normalize && npm run build:pre && npm run build && npm run build:post",
     "build:staging": "NODE_ENV=staging npm run build:normalize && npm run build:pre && npm run build && npm run build:post",
