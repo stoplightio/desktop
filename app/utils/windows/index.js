@@ -36,6 +36,7 @@ exports.createWindow = ({ app, logger, targetWindow } = {}) => {
       backgroundColor: '#1e2429',
       webPreferences: {
         webSecurity: false,
+        nodeIntegration: false,
         preload: Path.resolve(Path.join(__dirname, '..', 'browser', 'index.js')),
       },
     });
