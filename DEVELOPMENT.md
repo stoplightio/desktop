@@ -48,12 +48,24 @@ GH_TOKEN needs to be set in your environment.
 
 Code signing needs to be setup.
 
-1. Increment app/package.json version property.
-2. Build Stoplight Platform, replace app/build with newly built public files (just files/folders in the public directory).
+1.  Increment app/package.json version property.
+2.  Build Stoplight Platform, replace app/build with newly built public files (just files/folders in the public directory).
 
 ```bash
 yarn release:production
 ```
+
+### Environment Variables
+
+* The desktop app MUST bundle ALL if its own variables. It will not inherit variables from hosted stoplight since it now bundles all of its own assets.
+* Production environment variables are located in `app/.env`.
+* Development environment variables are located in `app/development.env`.
+
+##### Adding a Variable
+
+1.  Add its default production value (or set to empty string) to `app/.env`.
+2.  Add its default development value (or set to empty string) to `app/development.env`.
+3.  Add it to `app/utils/config/index.js`.
 
 ### Project Structure
 
