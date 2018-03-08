@@ -1,34 +1,34 @@
 const Path = require('path');
 
-// Setup environment variables
+// Setup environment variables first
 const pjson = require('./package.json');
 process.env.NODE_ENV = process.env.NODE_ENV || pjson.environment || 'development';
+let dotEnvData;
 if (process.env.NODE_ENV === 'development') {
-  require('dotenv').config({
+  dotEnvData = require('dotenv').config({
     path: Path.resolve(__dirname, 'development.env'),
   });
 } else {
-  require('dotenv').config({
+  dotEnvData = require('dotenv').config({
     path: Path.resolve(__dirname, '.env'),
   });
 }
+const configUtils = require('./utils/config');
+configUtils.setEnvVariables({ variables: dotEnvData ? dotEnvData.parsed : {} });
+configUtils.init();
 
 const _ = require('lodash');
-const electron = require('electron');
+const { app, ipcMain, BrowserWindow, dialog, shell, session, protocol } = require('electron');
 const os = require('os');
 const url = require('url');
 const request = require('request');
 
 const windowUtils = require('./utils/windows');
 const networkingUtils = require('./utils/networking');
-const configUtils = require('./utils/config');
 const prismUtils = require('./utils/prism');
 const sessionUtils = require('./utils/session');
 const oauthUtils = require('./utils/oauth');
 
-const { app, ipcMain, BrowserWindow, dialog, shell, session, protocol } = electron;
-
-configUtils.init();
 networkingUtils.init({ app });
 
 // LOGGING

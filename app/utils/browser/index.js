@@ -6,6 +6,7 @@ const fileWatcher = require('chokidar');
 const OAuth2 = require('simple-oauth2');
 const shortid = require('shortid');
 const _ = require('lodash');
+const Analytics = require('electron-ga').default;
 
 const { ipcRenderer, remote, clipboard } = electron;
 const { app, Menu, shell, dialog } = remote;
@@ -16,6 +17,12 @@ const config = remote.require('./utils/config');
 const env = remote.process.env;
 if (env.NODE_ENV === 'development') {
   require('devtron').install();
+}
+
+let analytics;
+const gaKey = config.get('integrations.ga.key');
+if (gaKey) {
+  analytics = new Analytics(gaKey);
 }
 
 const createOAuth2 = ({ client_id, client_secret, access_token_url, authorize_url }) =>
@@ -39,6 +46,7 @@ global.Electron = {
   dialog,
   fileWatcher,
   ipc: ipcRenderer,
+  dataPath,
   config: {
     get: path => {
       return _.cloneDeep(config.get(path));
@@ -47,24 +55,28 @@ global.Electron = {
       return config.set(path, JSON.parse(JSON.stringify(value)));
     },
   },
+  listeners: {
+    onRouteDidChange: ({ userId }) => {
+      if (analytics) {
+        setTimeout(() => {
+          analytics.send('pageview', {
+            aid: 'com.stoplight.app',
+            uid: userId,
+            dl: window.location.toString(),
+            dp: `${window.location.pathname}${window.location.search}`,
+            dh: window.location.hostname,
+            dt: document.title,
+          });
+        }, 50);
+      }
+    },
+  },
   events: {
     onOpenFile: null, // app must implement this to hook into file open events
     onOpenUrl: null, // app must implement this to hook into url open events
     onOpenAbout: null, // app must implement this to hook into open about
   },
-  env: {
-    name: env.NODE_ENV,
-    arch: os.arch(),
-    platform: os.platform(),
-    version: app.getVersion(),
-    dataPath,
-    http_proxy: env.HTTPS_PROXY || env.https_proxy || env.HTTP_PROXY || env.http_proxy,
-    no_proxy: env.NO_PROXY || env.no_proxy,
-    http_proxy_user:
-      env.HTTPS_PROXY_USER || env.https_proxy_user || env.HTTP_PROXY_USER || env.http_proxy_user,
-    http_proxy_pass:
-      env.HTTPS_PROXY_PASS || env.https_proxy_pass || env.HTTP_PROXY_PASS || env.http_proxy_pass,
-  },
+  env: config.getEnvVariables(),
   oauth: {
     //credentials: { scope, client_id, client_secret, access_token_url, authorize_url }
     getAuthorizeURL: credentials => {

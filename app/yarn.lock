@@ -297,6 +297,12 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
 
+electron-ga@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/electron-ga/-/electron-ga-1.0.5.tgz#3e42c2e09b7d877edd3bcf5141fd8f2e720747f4"
+  dependencies:
+    node-machine-id "^1.1.9"
+
 electron-is-dev@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/electron-is-dev/-/electron-is-dev-0.3.0.tgz#14e6fda5c68e9e4ecbeff9ccf037cbd7c05c5afe"
@@ -868,6 +874,10 @@ ms@2.0.0:
 nan@^2.3.0:
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.9.2.tgz#f564d75f5f8f36a6d9456cca7a6c4fe488ab7866"
+
+node-machine-id@^1.1.9:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/node-machine-id/-/node-machine-id-1.1.10.tgz#b4cb8f01b25b90d4e0675be00df30e61ee75179b"
 
 node-pre-gyp@^0.6.39:
   version "0.6.39"

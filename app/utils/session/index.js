@@ -1,5 +1,7 @@
 const { session, ipcMain } = require('electron');
 
+const config = require('../config');
+
 let log;
 let currentSession;
 
@@ -17,22 +19,25 @@ exports.init = ({ logger }, cb) => {
 
 exports.getCurrentSession = cb => {
   if (session.defaultSession) {
-    session.defaultSession.cookies.get({ url: process.env.SL_HOST }, (error, cookies) => {
-      let found = null;
-      if (error) {
-        log('session.get.error', error);
-        return;
-      } else {
-        for (const cookie of cookies) {
-          if (cookie.name === '_stoplight_session') {
-            found = cookie;
-            break;
+    session.defaultSession.cookies.get(
+      { url: config.get('networking.platformHost') },
+      (error, cookies) => {
+        let found = null;
+        if (error) {
+          log('session.get.error', error);
+          return;
+        } else {
+          for (const cookie of cookies) {
+            if (cookie.name === '_stoplight_session') {
+              found = cookie;
+              break;
+            }
           }
         }
-      }
 
-      cb(found);
-    });
+        cb(found);
+      }
+    );
   } else {
     cb();
   }
@@ -43,7 +48,7 @@ ipcMain.on('session.create', (_event, options) => {
     log('session.create');
     session.defaultSession.cookies.set(
       {
-        url: process.env.SL_HOST,
+        url: config.get('networking.platformHost'),
         name: '_stoplight_session',
         value: options.value,
         httpOnly: true,

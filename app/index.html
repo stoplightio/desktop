@@ -19,19 +19,7 @@
 
   <script>
     window.__SL = {
-      config: {
-        "NODE_ENV": Electron.env.name,
-        "RELEASE_STAGE": Electron.env.name,
-        "APP_VERSION": Electron.version,
-        "SL_APP_HOST": "stoplight://stoplight.io",
-        "SL_API_HOST": Electron.config.get('networking.apiHost'),
-        "SL_EXPORTER_HOST": Electron.config.get('networking.exporterHost'),
-        "SL_PRISM_HOST": Electron.config.get('networking.prismHost'),
-        "GITHUB_CLIENT_ID": "756956c5ddce1b579de6",
-        "GA_KEY": "UA-73790375-8",
-        "INTERCOM_KEY": "g7eo4oae",
-        "BUGSNAG_KEY": "45837fb90fa3085732214a960e9545ea"
-      }
+      config: Electron.env
     };
   </script>
 
@@ -54,11 +42,11 @@
 
   <script src="/js/bugsnag.min.js"></script>
   <script>
-    if (typeof bugsnag !== 'undefined') {
+    if (typeof bugsnag !== 'undefined' && window.__SL.config.BUGSNAG_KEY) {
       window.Bugsnag = bugsnag({
         apiKey: window.__SL.config.BUGSNAG_KEY,
         appVersion: window.__SL.config.APP_VERSION,
-        releaseStage: 'production',
+        releaseStage: Electron.env.name,
         metaData: {
           desktop: true,
         }
@@ -71,48 +59,40 @@
   <div id="root" class="h-100"></div>
 
   <script id="intercom-script">
-    (function () {
-      var w = window;
-      var ic = w.Intercom;
-      if (typeof ic === "function") {
-        ic('reattach_activator');
-        ic('update', window.intercomSettings);
-      } else {
-        var d = document;
-        var i = function () {
-          i.c(arguments)
-        };
-        i.q = [];
-        i.c = function (args) {
-          i.q.push(args)
-        };
-        w.Intercom = i;
-
-        function l() {
-          var s = d.createElement('script');
-          s.type = 'text/javascript';
-          s.async = true;
-          s.src = 'https://widget.intercom.io/widget/' + window.__SL.config.INTERCOM_KEY;
-          var x = d.getElementsByTagName('script')[0];
-          x.parentNode.insertBefore(s, x);
-        }
-        if (w.attachEvent) {
-          w.attachEvent('onload', l);
+    if (window.__SL.config.INTERCOM_KEY) {
+      (function () {
+        var w = window;
+        var ic = w.Intercom;
+        if (typeof ic === "function") {
+          ic('reattach_activator');
+          ic('update', window.intercomSettings);
         } else {
-          w.addEventListener('load', l, false);
-        }
-      }
-    })()
-  </script>
+          var d = document;
+          var i = function () {
+            i.c(arguments)
+          };
+          i.q = [];
+          i.c = function (args) {
+            i.q.push(args)
+          };
+          w.Intercom = i;
 
-  <script id="google-analtyics-script">
-    var script = document.createElement('script');
-    script.src = 'https://www.google-analytics.com/analytics.js';
-    document.head.appendChild(script);
-    window.ga = window.ga || function () {
-      (ga.q = ga.q || []).push(arguments)
-    };
-    ga.l = +new Date;
+          function l() {
+            var s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'https://widget.intercom.io/widget/' + window.__SL.config.INTERCOM_KEY;
+            var x = d.getElementsByTagName('script')[0];
+            x.parentNode.insertBefore(s, x);
+          }
+          if (w.attachEvent) {
+            w.attachEvent('onload', l);
+          } else {
+            w.addEventListener('load', l, false);
+          }
+        }
+      })()
+    }
   </script>
 
   <script type="text/javascript" src="/static/js/manifest.js"></script>
