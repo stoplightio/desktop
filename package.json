@@ -4,6 +4,10 @@
     "type": "git",
     "url": "git+https://github.com/stoplightio/desktop.git"
   },
+  "author": {
+    "name": "Stoplight",
+    "email": "support@stoplight.io"
+  },
   "scripts": {
     "start": "NODE_ENV=development electron ./app",
     "setup": "rm -R node_modules && yarn",
@@ -12,26 +16,52 @@
     "build:normalize": "node build-normalize",
     "build:pre": "node build-pre",
     "build:post": "node build-post",
-    "build": "build --mac --linux --win --x64 --ia32",
-    "release": "build --mac --linux --win --x64 --ia32",
-    "build:production": "NODE_ENV=production npm run build:normalize && npm run build:pre && npm run build && npm run build:post",
-    "build:staging": "NODE_ENV=staging npm run build:normalize && npm run build:pre && npm run build && npm run build:post",
-    "release:production": "NODE_ENV=production npm run build:normalize && npm run build:pre && npm run release && npm run build:post",
-    "release:staging": "NODE_ENV=staging npm run build:normalize && npm run build:pre && npm run release && npm run build:post",
+    "build": "electron-builder --mac --linux --win",
+    "release": "electron-builder --mac --linux --win",
+    "build:production": "NODE_ENV=production yarn build:normalize && yarn build:pre && yarn build && yarn build:post",
+    "build:staging": "NODE_ENV=staging yarn build:normalize && yarn build:pre && yarn build && yarn build:post",
+    "release:production": "NODE_ENV=production yarn build:normalize && yarn build:pre && yarn release && yarn build:post",
+    "release:staging": "NODE_ENV=staging yarn build:normalize && yarn build:pre && yarn release && yarn build:post",
     "format": "prettier --write \"**/*.js\""
   },
   "devDependencies": {
     "adm-zip": "0.4.x",
     "devtron": "1.4.x",
-    "electron": "1.8.3",
-    "electron-builder": "19.47.1",
+    "electron": "1.8.4",
+    "electron-builder": "20.5.1",
     "fs-extra": "5.x.x",
     "prettier": "1.11.1",
     "request": "2.x.x"
   },
   "build": {
     "appId": "com.stoplight.app",
+    "compression": "normal",
+    "asar": true,
+    "publish": {
+      "provider": "github"
+    },
+    "extraResources": [
+      {
+        "from": "build-tmp/${os}/${arch}",
+        "to": "app"
+      }
+    ],
     "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "extendInfo": {
         "CFBundleURLTypes": [
           {
@@ -41,35 +71,37 @@
             "CFBundleURLName": "Stoplight Protocol"
           }
         ]
-      },
-      "category": "public.app-category.developer-tools",
-      "target": [
-        "dmg",
-        "zip"
-      ]
+      }
     },
     "linux": {
       "category": "Development",
       "target": [
-        "deb",
-        "AppImage"
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
       ]
     },
     "win": {
       "target": [
-        "nsis"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
       ]
-    },
-    "compression": "normal",
-    "asar": true,
-    "extraResources": [
-      {
-        "from": "build-tmp/${os}/${arch}",
-        "to": "app"
-      }
-    ],
-    "publish": {
-      "provider": "github"
     }
   }
 }
