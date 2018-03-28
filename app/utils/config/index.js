@@ -77,7 +77,7 @@ exports.init = () => {
       exporterHost: process.env.SL_EXPORTER_HOST || '',
       prismHost: process.env.SL_PRISM_HOST || '',
       pubsHost: process.env.SL_PUBS_HOST || '',
-      pubsIngressHost: process.env.SL_PUBS_INGRESS_HOST || '',
+      pubsIngress: process.env.SL_PUBS_INGRESS || '',
 
       proxy: {
         url: process.env.HTTPS_PROXY || process.env.HTTP_PROXY || '',
