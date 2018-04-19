@@ -30,7 +30,7 @@
     "electron": "1.8.4",
     "electron-builder": "20.5.1",
     "fs-extra": "5.x.x",
-    "prettier": "1.11.1",
+    "prettier": "1.12.1",
     "request": "2.x.x"
   },
   "build": {
