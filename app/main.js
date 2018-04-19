@@ -128,7 +128,12 @@ app.on('ready', () => {
       const firstPart = url ? url.split('/')[1] : '';
       if (
         !firstPart ||
-        !['index.html', 'css', 'static', 'js', 'fonts', 'uploads', 'images'].includes(firstPart)
+        // basic assets
+        (!['index.html', 'css', 'static', 'js', 'fonts', 'uploads', 'images'].includes(firstPart) &&
+          // workers
+          !_.endsWith(firstPart, '.worker.js') &&
+          // map files
+          !_.endsWith(firstPart, '.js.map'))
       ) {
         return callback(Path.normalize(`${__dirname}/index.html`));
       }
