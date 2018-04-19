@@ -28,7 +28,7 @@ yarn build:production
 
 ##### Code Signing
 
-This is useful: https://mkaz.tech/code-signing-a-windows-application.html.
+This is useful: https://mkaz.blog/code/code-signing-a-windows-application/.
 
 CSC_LINK, WIN_CSC_LINK, and CSC_KEY_PASSWORD must be set in your environment. For example:
 
