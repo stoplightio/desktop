@@ -1,5 +1,3 @@
-const Path = require('path');
-const os = require('os');
 const fs = require('fs-extra');
 const electron = require('electron');
 const fileWatcher = require('chokidar');
