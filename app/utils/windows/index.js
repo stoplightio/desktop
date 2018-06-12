@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const electron = require('electron');
 const Path = require('path');
 const windowStateKeeper = require('electron-window-state');
