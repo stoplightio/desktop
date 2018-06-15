@@ -27,7 +27,6 @@ const windowUtils = require('./utils/windows');
 const networkingUtils = require('./utils/networking');
 const prismUtils = require('./utils/prism');
 const sessionUtils = require('./utils/session');
-const oauthUtils = require('./utils/oauth');
 
 networkingUtils.init({ app });
 
@@ -145,7 +144,6 @@ app.on('ready', () => {
     }
   );
 
-  oauthUtils.init();
   windowUtils.createWindow({ app, logger: browserLogger });
 
   sessionUtils.init({ app, logger: browserLogger }, () => {
