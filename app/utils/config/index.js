@@ -47,6 +47,7 @@ exports.getEnvVariables = () => {
   if (config) {
     configVars = {
       SL_PLATFORM_HOST: exports.get('networking.platformHost'),
+      SL_APP_HOST: exports.get('networking.appHost'),
       SL_API_HOST: exports.get('networking.apiHost'),
       SL_EXPORTER_HOST: exports.get('networking.exporterHost'),
       SL_PRISM_HOST: exports.get('networking.prismHost'),
@@ -72,7 +73,8 @@ exports.init = () => {
   // don't store defaults in config, so that not written to disk
   defaults = {
     networking: {
-      platformHost: process.env.SL_PLATFORM_HOST || '',
+      platformHost: process.env.SL_APP_HOST || '',
+      appHost: process.env.SL_APP_HOST || '',
       apiHost: process.env.SL_API_HOST || '',
       exporterHost: process.env.SL_EXPORTER_HOST || '',
       prismHost: process.env.SL_PRISM_HOST || '',
