@@ -8,8 +8,20 @@ autoUpdater.fullChangelog = true;
 
 let hasInitted = false;
 let manualUpdateCheck = false;
-let cancelUpdateChecks = false;
 let lastCheck;
+
+const shouldCheck = () => {
+  const now = new Date();
+
+  if (manualUpdateCheck) return true;
+
+  // auto check at most once every 5 minutes
+  if (lastCheck && now.getTime() - lastCheck.getTime() < 300000) {
+    return false;
+  }
+
+  return true;
+}
 
 autoUpdater.on('download-progress', progressObj => {
   if (windows.getMainWindow()) {
@@ -32,7 +44,6 @@ autoUpdater.on('checking-for-update', () => {
 });
 
 autoUpdater.on('update-available', info => {
-  cancelUpdateChecks = true;
   manualUpdateCheck = false;
 
   if (windows.getMainWindow()) {
@@ -55,7 +66,7 @@ autoUpdater.on('update-downloaded', info => {
 });
 
 exports.checkForUpdates = () => {
-  if (cancelUpdateChecks) {
+  if (!shouldCheck()) {
     return;
   }
 
