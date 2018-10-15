@@ -32,7 +32,7 @@ exports.createWindow = ({ app, logger, targetWindow } = {}) => {
       width: mainWindowState.width,
       height: mainWindowState.height,
       center: true,
-      backgroundColor: '#1e2429',
+      backgroundColor: '#13101C',
       webPreferences: {
         webSecurity: false,
         nodeIntegration: false,

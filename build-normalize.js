@@ -12,14 +12,12 @@ const normalizeFileNames = (dir, names) => {
     }
 
     if (names.includes(parts[0])) {
-      fs.moveSync(`${dir}/${fileName}`, `${dir}/${parts[0]}.${ext}`);
+      fs.moveSync(`${dir}/${fileName}`, `${dir}/js/${parts[0]}.${ext}`);
     }
   }
 };
 
 // cleanup the build folder
 console.log('BUILD: Cleanup.');
-fs.removeSync('app/build/robots.txt');
-fs.removeSync('app/build/static/media');
-normalizeFileNames('app/build/static/js', ['client', 'manifest', 'vendor']);
-normalizeFileNames('app/build/static/css', ['bundle']);
+fs.removeSync('app/build/index.html');
+normalizeFileNames('app/build', ['index', 'runtime', 'vendors~index']);
