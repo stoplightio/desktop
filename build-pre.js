@@ -15,10 +15,6 @@ const proxyMap = {
       source: 'prism_darwin_amd64',
       target: 'prism',
     },
-    ia32: {
-      source: 'prism_darwin_386',
-      target: 'prism',
-    },
   },
   linux: {
     x64: {
@@ -57,7 +53,6 @@ const mkProxyFiles = (os, arch) => {
 
 const mkFiles = () => {
   mkProxyFiles('mac', 'x64');
-  mkProxyFiles('mac', 'ia32');
   mkProxyFiles('linux', 'x64');
   mkProxyFiles('linux', 'ia32');
   mkProxyFiles('win', 'x64');
