@@ -20,7 +20,11 @@ if (env.NODE_ENV === 'development') {
 let analytics;
 const gaKey = config.get('integrations.ga.key');
 if (gaKey) {
-  analytics = new Analytics(gaKey);
+  try {
+    analytics = new Analytics(gaKey);
+  } catch (err) {
+    console.error('Google Analytics error:', err);
+  }
 }
 
 const createOAuth2 = ({ client_id, client_secret, access_token_url, authorize_url }) =>
