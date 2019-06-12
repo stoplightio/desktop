@@ -27,7 +27,7 @@
   "devDependencies": {
     "adm-zip": "0.4.x",
     "devtron": "1.4.x",
-    "electron": "1.8.7",
+    "electron": "1.8.8",
     "electron-builder": "20.5.1",
     "fs-extra": "5.x.x",
     "prettier": "1.13.3",
