@@ -2,7 +2,7 @@
   "name": "stoplight-next",
   "productName": "Stoplight Next",
   "description": "The best way to model, document, and test APIs.",
-  "version": "4.10.2",
+  "version": "4.10.6",
   "environment": "production",
   "license": "Apache-2.0",
   "author": {
