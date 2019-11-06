@@ -1,6 +1,6 @@
 # Stoplight Desktop App
 
-(Looking for the latest and greatest visual editor from Stoplight? See https://stoplight.io/studio/)
+Looking for the latest and greatest visual editor from Stoplight? Check out [Stoplight Studio](https://stoplight.io/studio/)
 
 This is a wrapper around the Stoplight Platform, that makes certain native functionality available to it. It also starts and manages a local instance Prism on your computer for you.
 
